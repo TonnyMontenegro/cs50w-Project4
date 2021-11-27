@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+{% block Title %} Registrarse {% endblock %}
+{% block body %} 
+<div class="container mt-5">
+    <div class="row">
+      <div class="col-lg-10 col-xl-10 mx-auto">
+        <div class="card flex-row my-5 border-0 shadow rounded-3 overflow-hidden">
+          <div class="card-img-left d-none d-md-flex reg">
+          </div>
+          <div class="card-body p-4 p-sm-8">
+            <h5 class="card-title text-center mb-5 fw-light fs-5">Registro de usuario</h5>
+
+            {% if form.errors %}
+            <div class="container">       
+              <div class="alert alert-danger" role="alert">
+                {{ form.errors }}
+              </div>
+            </div>
+            {% endif %}
+            
+            <form method="post" action="">
+              <!-- {{form} -->
+
+              {% csrf_token %}
+
+              <div class="form mb-3">
+                <!-- <input type="text" class="form-control" id="floatingInputName" placeholder="Tonny" required autofocus>
+                <label for="floatingInputUsername">Nombre</label> -->
+                <label for="id_last_name">
+                  {{ form.first_name.label }}
+                </label>
+                {{ form.first_name }}
+              </div>
+
+              <div class="form mb-3">
+                <!-- <input type="text" class="form-control" id="floatingInputSurname" placeholder="Montenegro" required>
+                <label for="floatingInputEmail">Apellido</label> -->
+                <label for="id_last_name">
+                  {{ form.last_name.label }}
+                </label>
+                {{ form.last_name }}
+              </div>
+
+              <div class="form mb-3">
+                <!-- <input type="email" class="form-control" id="floatingInputEmail" placeholder="Tonny@mail.com" required>
+                <label for="floatingInputEmail">Correo electronico</label> -->
+                <label for="id_email">
+                  {{ form.email.label }}
+                </label>
+                {{ form.email }}
+              </div>
+
+              <!-- <div class="form-floating mb-3">
+                <input type="tel" class="form-control" id="floatingInputNumber" placeholder="83854816" required>
+                <label for="floatingInputEmail">Numero</label>
+              </div> -->
+
+              <hr>
+
+              <div class="form mb-3">
+                <!-- <input type="password" class="form-control" id="floatingPassword" placeholder="Password" required>
+                <label for="floatingPassword">Contraseña</label> -->
+                <label for="id_username">
+                  {{ form.username.label }}
+                </label>
+                {{ form.username }}
+              </div>
+
+              <div class="form mb-3">
+                <!-- <input type="password" class="form-control" id="floatingPassword" placeholder="Password" required>
+                <label for="floatingPassword">Contraseña</label> -->
+                <label for="id_password1">
+                  {{ form.password1.label }}
+                </label>
+                {{ form.password1 }}
+              </div>
+
+              <div class="form mb-3">
+                <!-- <input type="password" class="form-control" id="floatingPasswordConfirm" placeholder="Confirm Password" required>
+                <label for="floatingPasswordConfirm">Confirmar Contraseña</label> -->
+                <label for="id_password1">
+                {{ form.password2.label }}
+                </label>
+                {{ form.password2 }}
+                
+              </div> 
+
+              <div class="d-grid mb-2">
+                <button class="btn btn-lg btn-primary btn-login fw-bold text-uppercase" type="submit" name="create_user">Registrarse</button>
+              </div>
+
+            </form>
+            <a class="d-block text-center mt-2 small" href="login">Ya tiene una cuenta? Iniciar sesion</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+{% block Title %} Iniciar sesion {% endblock %}
+{% block body %} 
+<div class="container Menu p-4 rounded shadow-lg">
+  <div class="card m-3">
+    <h3 class="card-header text-center" id="Regular_pizza">Pizza Regular</h3>
+    <div class="card-body">
+      <div class="card mb-3">
+        <div class="image">
+        <img src="/static/RegularPizza.webp" class="card-img-top rounded" alt="...">
+      </div>
+        <div class="card-body">
+          <!-- <h5 class="card-title">Card title</h5>
+          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card m-3">
+    <h3 class="card-header text-center" id="Sicilian_pizza">Pizza Sicilian</h3>
+    <div class="card-body">
+      <div class="card mb-3">
+        <div class="image">
+        <img src="/static/SicilianPizza.jpg" class="card-img-top rounded" alt="...">
+      </div>
+        <div class="card-body">
+          <!-- <h5 class="card-title">Card title</h5>
+          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card m-3">
+    <h3 class="card-header text-center"id="Toppings">Toppings</h3>
+    <div class="card-body">
+      <div class="card mb-3">
+        <div class="image">
+        <img src="/static/Toppings.jpg" class="card-img-top rounded" alt="...">
+      </div>
+        <div class="card-body">
+          <!-- <h5 class="card-title">Card title</h5>
+          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card m-3">
+    <h3 class="card-header text-center" id="Subs">Subs</h3>
+    <div class="card-body">
+      <div class="card mb-3">
+        <div class="image">
+        <img src="/static/Subs.jpg" class="card-img-top rounded" alt="...">
+      </div>
+        <div class="card-body">
+          <!-- <h5 class="card-title">Card title</h5>
+          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card m-3">
+    <h3 class="card-header text-center" id="Pasta">Pasta</h3>
+    <div class="card-body">
+      <div class="card mb-3">
+        <div class="image">
+        <img src="/static/Pasta.jpeg" class="card-img-top rounded" alt="...">
+      </div>
+        <div class="card-body">
+          <!-- <h5 class="card-title">Card title</h5>
+          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card m-3">
+    <h3 class="card-header text-center" id="Ensalada">Ensalada</h3>
+    <div class="card-body">
+      <div class="card mb-3">
+        <div class="image">
+        <img src="/static/Ensalada.jpg" class="card-img-top rounded" alt="...">
+      </div>
+        <div class="card-body">
+          <!-- <h5 class="card-title">Card title</h5>
+          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card m-3">
+    <h3 class="card-header text-center" id="Platillos_de_cena">Platillos de cena</h3>
+    <div class="card-body">
+      <div class="card mb-3">
+        <div class="image">
+        <img src="/static/Cena.webp" class="card-img-top rounded" alt="...">
+      </div>
+        <div class="card-body">
+          <!-- <h5 class="card-title">Card title</h5>
+          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button type="button" id="BackTop" class="toTop-arrow" style="z-index: 100;"></button>
+
+<script>
+    // Functions scrolling upwards
+    $(function () {
+        $('#BackTop').click(function () {
+            $('html,body').animate({scrollTop: 0}, 500);
+        });
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 300) {
+                $('#BackTop').fadeIn(300);
+            } else {
+                $('#BackTop').stop().fadeOut(300);
+            }
+        }).scroll();
+    });
+</script>
+{% endblock %}
