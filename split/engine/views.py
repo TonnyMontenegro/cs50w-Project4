@@ -3,7 +3,7 @@ from django.contrib.auth import login,logout,authenticate
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
-from .models import Cuenta_func
+from .models import *
 from django.http import HttpResponse,HttpResponseRedirect, request
 from .forms import UserRegisterForm
 from django.views.decorators.csrf import csrf_protect
@@ -19,7 +19,7 @@ if contador is None:
     n_contador =Cuenta_func(cuenta_numero=1)
     n_contador.save()
 if superuser.count() == 0:
-    superuser=User.objects.create_user("Admin","Admin@pizzapp.com","Password")
+    superuser=User.objects.create_user("Admin","Admin@Split.com","Password")
     superuser.is_superuser = True
     superuser.is_staff = True
     superuser.save()
@@ -46,7 +46,10 @@ def register_view(request):
 
 @login_required(login_url="login")
 def menu_view(request):
-    return render(request,'menu.html')
+    context={}
+    context['amigos'] = cliente.objects.filter(usuario_main=request.user)
+    context['locales'] = local.objects.filter(creador=request.user)
+    return render(request,'menu.html',context)
 
 @csrf_protect
 def login_view(request):
@@ -66,9 +69,80 @@ def login_view(request):
         return render(request,"login.html",context)
     else: return redirect("home")
 
+def about_view(request):
+    return render(request,"about.html")
+
+def history_view(request):
+    return render(request,"history.html")
+
 def logout_user(request):
     logout(request)
     return redirect('login')
 
-# def index(request):
-#     return HttpResponse("nyaa")
+@login_required(login_url="")
+def add_local(request):
+    if request.method == "POST":
+        Nombre_local = request.POST.get('nombre_local')
+        descripcion_local = request.POST.get('descripcion_local')
+        print(Nombre_local)
+        existe = local.objects.filter(creador=request.user,nombre=Nombre_local).exists()
+        
+        if existe:
+            messages.error(request,"Ese local ya se encuentra registrado")
+        else:
+            messages.info(request,"Local registrado con exito")
+            local.objects.create(creador=request.user,nombre=Nombre_local,descripcion=descripcion_local)
+        
+        return redirect('home')
+
+@login_required(login_url="")
+def remove_local(request,pk):
+    if request.method == "POST":
+
+        local.objects.get(pk=pk).delete()
+        messages.info(request,"Local eliminado con exito")
+        return redirect('home')
+
+@login_required(login_url="")
+def add_friend(request):
+    if request.method == "POST":
+        nombres = request.POST.get('nombres_friend')
+        apellidos = request.POST.get('apellidos_friend')
+        correo = request.POST.get('email_friend')
+
+        existe = cliente.objects.filter(usuario_main=request.user,correo=correo).exists()
+        
+        if existe:
+            messages.error(request,"Ese correo ya se encuentra registrado para otro usuario")
+        else:
+            messages.info(request,"amigo registrado con exito")
+            cliente.objects.create(usuario_main=request.user,nombres=nombres,apellidos=apellidos,correo=correo)
+        
+        return redirect('home')
+
+@login_required(login_url="")
+def new_bill(request,pk):
+    if request.method == "POST":
+        return redirect('home')
+
+@login_required(login_url="")
+def edit_friend(request,pk):
+    if request.method == "POST":
+        nombres = request.POST.get('nombres_friend_edit')
+        apellidos = request.POST.get('apellidos_friend_edit')
+        correo = request.POST.get('email_friend_edit')
+
+        amigo = cliente.objects.get(pk=pk)
+        existe = cliente.objects.filter(correo=correo).exclude(pk=pk).exists()
+        
+        if existe:
+            messages.error(request,"Ese correo ya se encuentra registrado para otro usuario")
+        else:
+            amigo.nombres = nombres
+            amigo.apellidos = apellidos
+            amigo.correo = correo
+            amigo.save
+            messages.info(request,"amigo editado con exito")
+            
+        
+        return redirect('home')

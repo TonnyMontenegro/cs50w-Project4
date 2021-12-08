@@ -22,5 +22,12 @@ urlpatterns = [
     path('register', views.register_view, name='register'),
     path('login', views.login_view, name="login"),
     path('home', views.menu_view, name="home"),
+    path('about', views.about_view, name="about"),
+    path('history', views.history_view, name="history"),
     path('logout', views.logout_user, name="logout"),
+    path('add_local',views.add_local,name='add_local'),
+    path('remove_local/<int:pk>',views.remove_local,name='remove_local'),
+    path('add_friend',views.add_friend,name='add_friend'),
+    path('new_bill',views.new_bill,name='new_bill'),
+    path('edit_friend/<int:pk>', views.edit_friend ,name="edit_friend"),
 ]

@@ -24,26 +24,16 @@
 			  <div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav ml-auto">
 					{% if user.is_authenticated %}
-						<li class="dropdown">
-							<a href="home" class="nav-item nav-link" data-toggle="dropdown">Menu</a>
-							<div class="dropdown-menu">
-								<a href="#Regular_pizza" class="dropdown-item">Pizza Regular</a>
-								<a href="#Sicilian_pizza" class="dropdown-item">Pizza Sicilian</a>
-								<a href="#Toppings" class="dropdown-item">Toppings</a>
-								<a href="#Subs" class="dropdown-item">Subs</a>
-								<a href="#Pasta" class="dropdown-item">Pasta</a>
-								<a href="#Ensalada" class="dropdown-item">Ensalada</a>
-								<a href="#Platillos_de_cena" class="dropdown-item">Platillos de cena</a>
-							</div>
-						</li>
-						<li><a href="cart" class="nav-item nav-link ">Carrito</a></li>
-						<li><a href="orders" class="nav-item nav-link ">Ordenes</a></li>
+						<li><a href="home" class="nav-item nav-link ">Menu principal</a></li>
+						<li><a href="history" class="nav-item nav-link ">ver historial</a></li>
+						<li><a href="about" class="nav-item nav-link ">Acerca de split</a></li>
 						<li><a href="logout" class="nav-item nav-link ">Cerrar sesion</a></li>
 
-						<li class="UserName "><p class="nav-link active mx-2"> Hola {{ user.first_name }} {{ user.last_name }}</p></li>
+						<li class="UserName "><p class="nav-link mx-2"> Hola {{ user.first_name }} {{ user.last_name }}</p></li>
 					{% else %}
-						<li><a href="register" class="nav-item nav-link active">Registrarse</a></li>
-						<li><a href="login" class="nav-item nav-link active">Iniciar sesion</a></li>
+						<li><a href="register" class="nav-item nav-link ">Registrarse</a></li>
+						<li><a href="login" class="nav-item nav-link ">Iniciar sesion</a></li>
+						<li><a href="about" class="nav-item nav-link ">acerca de split</a></li>
 					{% endif %}
 				</ul>
 			</div>

@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block Title %} Acerca de split {% endblock %}
+{% block body %} 
+
+<div class="container bg-light Menu rounded py-5 shadow-lg">
+    <div class="row">
+		<div class="col-md-6">
+            <div class="card about-card">
+                <img src="/static/SplitLogo.png" class="card-img-top" alt="...">
+                <div class="card-body text-center">
+                    <h2>¿Que es split?</h2>
+                  <p class="card-text">Split es una plataforma que se encarga de dividir la cuenta entre tu y tus amigos en una mesa según el consumo personal de cada miembro de la mesa.</p>
+                  <p>solo creas una mesa, colocas los nombre de cada persona, agregas los productos consumidos seleccionando a cada persona que consumió dicho producto, Split te dividirá la cantidad de dinero que le corresponde a cada uno, el IVA y la propina, también guardara un registro de cada una de tus cuentas para que puedas revisarlas cuando desees</p>
+                </div>
+                <img src="/static/PayingBill2Purple.png" class="card-img-top" alt="...">
+              </div>
+              <hr>
+		</div>
+		<div class="col-md-6">
+			<div class="card about-card">
+                <img src="/static/RestaurantTalkYellow.png"class="card-img-top" alt="...">
+                <div class="card-body text-center">
+                    <h2>Un claro ejemplo de ello</h2>
+                  <p class="card-text">van 5 amigos junto a ti a un restaurante y cada quien pide diferente cantidad de bebidas y postres pero todos comparten ciertos platillos como bandejas de alitas o surtidos, por lo que a la hora de pagar la cuenta no seria justo dividir equitativamente la cuenta, ahí es donde entra Split facilitando la tarea para ti y tus amigos.</p>
+                  <p>Lo ves Split es super es sencillo facil de usar y util, animate a probarlo, se que te va a encantar.</p>
+                </div>
+                <img src="/static/SplitSlogan.png" class="card-img-top" alt="...">
+              </div>
+              <hr>
+              <div class="text-center pt-5">
+              {% if user.is_authenticated %}
+              <a href='home' class="btn btn-primary">Ir al menu principal</a>
+              {% else %}
+              <a href='register' class="btn btn-primary m-2">Registrarse</a>
+              <a href='login' class="btn btn-secondary m-2 ">Iniciar sesion</a>
+              {% endif %}
+            </div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

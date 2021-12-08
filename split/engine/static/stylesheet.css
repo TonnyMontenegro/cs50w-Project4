@@ -45,6 +45,147 @@ body {
 /* END REGISTER/LOGIN STYLES */
 
 
+
+
+
+/* BUTTON BACKTOP */
+
+.toTop-arrow {
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 33%;
+  opacity: 0.7;
+  background: black;
+  cursor: pointer;
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  display: none;
+}
+
+/* BUTTON BACKTOP */
+
+.toTop-arrow {
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 33%;
+  opacity: 0.7;
+  background: black;
+  cursor: pointer;
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  display: none;
+}
+
+/* Unfocus when clicking a button*/
+.toTop-arrow:focus {
+  outline: none;
+}
+
+/* BUTTON BACKTOP END */
+
+.Menu{
+  margin: 15vh auto 10vh auto ;
+  width: 85vw;
+  height: auto;
+}
+
+.image{
+  height: auto;
+  width: 50vw;
+  margin:auto;
+}
+
+.UserName{
+  font-weight: 10px;
+}
+
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 400px){
+  html{
+    font-size: 80%;
+  }
+}
+
+@media only screen and (min-width: 400px){
+  html{
+    font-size: 84%;
+  }
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+  html{
+    font-size: 88%;
+  }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+  html{
+    font-size: 90%;
+  }
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+  html{
+    font-size: 95%;
+  }
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+  html{
+    font-size: 100%;
+  }
+}
+
+.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited , .border-color {
+  background-color: #810ae9 !important;
+  border-color: #810ae9 !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+.btn-secondary, .btn-secondary:hover, .btn-secondary:active, .btn-secondary:visited , .border-color {
+  background-color: rgb(255, 177, 30) !important;
+  border-color: rgb(255, 177, 30) !important;
+  color:#190529 !important;
+}
+
+.nav-link.active, .border-color{
+  background-color: #810ae9 !important;
+  border-color: #810ae9 !important;
+  color: rgb(255, 255, 255);
+}
+
+.nav-link{
+  color:#810ae9;
+}
+
+.border-primary{
+  border-color:#810ae9 !important;
+}
+
+.nav-link:hover{
+  color:#a659e9 !important;
+  background-color: #3f106638;
+  
+}
+
+
+
+
+
+
 /* NAVBAR STYLES */
 
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700,800');
@@ -58,8 +199,14 @@ h1 {
 }
 p {
   margin-bottom: 0.5em;
-  font-size: 1.6rem;
-  line-height: 1.6;
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+
+.about-card{
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 label{
@@ -107,6 +254,7 @@ label{
   -ms-transform: scaleX(1);
   transform: scaleX(1);
 }
+
 .overlay::after {
   content: '';
   position: absolute;
@@ -114,7 +262,7 @@ label{
   left: 0;
   right: 0;
   top: 0;
-  background-color: rgba(0, 0, 0, .3);
+  background-color: rgba(0, 0, 0, .8);
 }
 .header-area {
   position: relative;
@@ -208,7 +356,7 @@ label{
 }
 .navbar .dropdown-menu {
   padding: 0;
-  background-color: rgba(0, 0, 0, .7);
+  background-color: rgba(0, 0, 0, .9);
 }
 .navbar .dropdown-menu .dropdown-item {
   position: relative;
@@ -260,7 +408,7 @@ label{
   }
   .navbar-nav {
     padding: 0 20px;
-    background-color: rgba(0, 0, 0, .7);
+    background-color: rgba(0, 0, 0, .9);
   }
   .navbar.fixed-top .navbar-nav {
     background: transparent;
@@ -371,77 +519,3 @@ label{
 
 
 /* NAVBAR STYLES END */
-
-
-/* BUTTON BACKTOP */
-
-.toTop-arrow {
-  width: 3.5rem;
-  height: 3.5rem;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  border-radius: 33%;
-  opacity: 0.7;
-  background: black;
-  cursor: pointer;
-  position: fixed;
-  right: 1.5rem;
-  bottom: 1.5rem;
-  display: none;
-}
-
-/* Draw the up arrow in the button*/
-.toTop-arrow::before, .toTop-arrow::after {
-  width: 25px;
-  height: 5px;
-  border-radius: 4px;
-  background: orange;
-  position: absolute;
-  content: "";
-}
-
-.toTop-arrow::before {
-  transform: rotate(-45deg) translate(0, -55%);
-  left: 0.6rem;
-}
-
-.toTop-arrow::after {
-  transform: rotate(45deg) translate(0, -55%);
-  right: 0.6rem;
-}
-
-/* Unfocus when clicking a button*/
-.toTop-arrow:focus {
-  outline: none;
-}
-
-/* BUTTON BACKTOP END */
-
-.Menu{
-  margin: 15vh auto 10vh auto ;
-  width: 85vw;
-  height: auto;
-  background: url("/static/pattern.jpg");
-  background-repeat:repeat;
-  background-size: 45vh;
-}
-
-.image{
-  height: auto;
-  width: 50vw;
-  margin:auto;
-}
-
-.UserName{
-  font-weight: 10px;
-}
-
-
-
-/* Para split */
-/* background: rgb(129,10,233);
-background: -moz-radial-gradient(circle, rgba(129,10,233,1) 0%, rgba(129,18,221,1) 12%, rgba(129,28,204,1) 26%, rgba(116,25,184,1) 45%, rgba(99,22,157,1) 59%, rgba(81,23,125,1) 71%, rgba(73,24,111,1) 79%, rgba(59,20,89,1) 86%, rgba(34,19,46,1) 93%, rgba(10,6,14,1) 99%, rgba(0,0,0,1) 100%);
-background: -webkit-radial-gradient(circle, rgba(129,10,233,1) 0%, rgba(129,18,221,1) 12%, rgba(129,28,204,1) 26%, rgba(116,25,184,1) 45%, rgba(99,22,157,1) 59%, rgba(81,23,125,1) 71%, rgba(73,24,111,1) 79%, rgba(59,20,89,1) 86%, rgba(34,19,46,1) 93%, rgba(10,6,14,1) 99%, rgba(0,0,0,1) 100%);
-background: radial-gradient(circle, rgba(129,10,233,1) 0%, rgba(129,18,221,1) 12%, rgba(129,28,204,1) 26%, rgba(116,25,184,1) 45%, rgba(99,22,157,1) 59%, rgba(81,23,125,1) 71%, rgba(73,24,111,1) 79%, rgba(59,20,89,1) 86%, rgba(34,19,46,1) 93%, rgba(10,6,14,1) 99%, rgba(0,0,0,1) 100%);
-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#810ae9",endColorstr="#000000",GradientType=1); */

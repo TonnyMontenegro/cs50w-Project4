@@ -1,121 +1,239 @@
 {% extends "layout.html" %}
 {% block Title %} Iniciar sesion {% endblock %}
 {% block body %} 
-<div class="container Menu p-4 rounded shadow-lg">
-  <div class="card m-3">
-    <h3 class="card-header text-center" id="Regular_pizza">Pizza Regular</h3>
-    <div class="card-body">
-      <div class="card mb-3">
-        <div class="image">
-        <img src="/static/RegularPizza.webp" class="card-img-top rounded" alt="...">
+
+<div class="container bg-light Menu rounded pt-2 pb-4 shadow-lg">
+    
+  {% if messages %}
+  <div class="row m-2">
+  <div class="col-lg text-center">
+      {% for message in messages %}
+      <div class="alert alert-dismissible fade show alert-{{ message.tags }}" role="alert">
+          <p>{{ message }}</p>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
-        <div class="card-body">
-          <!-- <h5 class="card-title">Card title</h5>
-          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
+      {% endfor %}
+    </div>
+
+  </div>
+{% endif %}
+
+  <ul class="nav nav-pills nav-justified " id="pills-tab" role="tablist">
+    <li class="nav-item p-2" role="presentation">
+      <button class="nav-link active btn-lg" id="pills-locals-tab" data-bs-toggle="pill" data-bs-target="#pills-locals" type="button" role="tab" aria-controls="pills-locals" aria-selected="true">Lista de locales <i class="fas fa-store-alt fa-x2"></i></button>
+    </li>
+    <li class="nav-item p-2" role="presentation">
+      <button class="nav-link btn-lg" id="pills-friends-tab" data-bs-toggle="pill" data-bs-target="#pills-friends" type="button" role="tab" aria-controls="pills-friends" aria-selected="false">Lista de amigos <i class="fas fa-users fa-x2"></i></button>
+    </li>
+  </ul>
+
+
+  <div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-locals" role="tabpanel" aria-labelledby="pills-locals-tab">
+     
+      <div class="row row-cols-1 my-2 row-cols-md-2 g-5">
+
+        <div class="col">
+          <div class="card about-card shadow-lg border-primary">
+              <div class="card-body text-left">
+                  <h3>Agrega el nombre de el local que visitaras:</h3>
+                <p class="card-text">Una breve descripcion para que puedas recordar cada lugar que visites.</p>
+                <div class="container text-center">
+                  <button class="btn btn-secondary btn-lg m-3" data-bs-toggle="modal" data-bs-target="#add_local">Agregar nuevo local <i class="fas fa-plus fa-x2"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+      {% for local in locales %}
+      <div class="col">
+      <div class="card about-card shadow-lg border-primary">
+          <div class="card-body text-left">
+              <h3>{{ local.nombre }}:</h3>
+            <p class="card-text">{{ local.descripcion }}</p>
+            <div class="container text-center">
+              <a href="/bills/{{local.pk}}/" class="btn btn-secondary btn-sm m-3">Abrir nueva cuenta <i class="fas fa-file-invoice-dollar fa-lg"></i></a>
+              <button data-bs-toggle="modal" data-bs-target="#Remove_{{local.pk}}" class="btn btn-danger btn-sm  m-3">Eliminar <i class="fas fa-trash-alt fa-x2"></i></button>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div class="modal fade" id="Remove_{{local.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">¿Estas seguro que deseas eliminar este local?</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h4>No solo eliminaras el local sino tambian sus cuentas asociadas y todo lo relacionado a el, aun asi deseeas continuar</h4>
+            </div>
+            <div class="modal-footer">
+              <form action="/remove_local/{{local.pk}}" method="POST">
+                {% csrf_token %}
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-danger">Si,deseeo eliminarlo</button>
+            </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="new_bill_{{local.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Crear nueva cuenta en {{local.nombre}}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h4>No solo eliminaras el local sino tambian sus cuentas asociadas y todo lo relacionado a el, aun asi deseeas continuar</h4>
+            </div>
+            <div class="modal-footer">
+              <form action="/remove_local/{{local.pk}}" method="POST">
+                {% csrf_token %}
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-danger">Si,deseeo eliminarlo</button>
+            </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+    </div>
+
+    <div class="tab-pane fade" id="pills-friends" role="tabpanel" aria-labelledby="pills-friends-tab">
+      <div class="row row-cols-1 my-2 row-cols-md-2 g-5">
+
+        <div class="col">
+          <div class="card about-card shadow-lg border-primary">
+              <div class="card-body text-left">
+                  <h3>Agrega el nombre de tus amigos para tenerlos cuando salgan juntos</h3>
+                <p class="card-text">Añade su correo electronico para enviarle un reporte de la factura una vez generada.</p>
+                <div class="container text-center">
+                  <button data-bs-toggle="modal" data-bs-target="#add_friend" class="btn btn-secondary btn-lg m-3">Agregar amigo a la lista <i class="fas fa-plus fa-x2"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+      {% for amigo in amigos %}
+      <div class="col">
+      <div class="card about-card shadow-lg border-primary">
+          <div class="card-body text-left">
+              <h3>{{ amigo.nombres }} {{amigo.apellidos}}:</h3>
+            <p class="card-text">{{ amigo.correo }}</p>
+            <div class="container text-center">
+              <button data-bs-toggle="modal" data-bs-target="#Edit_friend_{{amigo.pk}}" class="btn btn-secondary btn-lg  m-3">Editar <i class="fas fa-user-edit fa-x2"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="Edit_friend_{{amigo.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Crear nueva cuenta en {{local.nombre}}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="/edit_friend/{{amigo.pk}}" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="Nombre_local" class="form-label">Nombres</label>
+                  <input type="text" class="form-control" name="nombres_friend_edit" id="nombres_friend" value="{{amigo.nombres}}" placeholder="John" required>
+                </div>
+        
+                <div class="mb-3">
+                  <label for="Nombre_local" class="form-label">Apellidos</label>
+                  <input type="text" class="form-control" name="apellidos_friend_edit" id="apellidos_friend" value="{{amigo.apellidos}}" placeholder="Doe" required>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="Descripcion_local" class="form-label">Correo electronico (aca se le enviaran las facturas a tu amigo)</label>
+                  <input type="email" class="form-control" name="email_friend_edit" value="{{amigo.correo}}" id="email_friend" placeholder="John.doe@mail.com" required></input>
+                </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" aria-current="page">editar amigo <i class="fas fa-user-plus fa-lg"></i></button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar <i class="fas fa-ban fa-lg"></i></button>
+              </div>
+            </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="modal fade my-5 text-dark text-left pt-5" id="add_friend" tabindex="1" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content ">
+        <div class="modal-header">
+          <h2 class="modal-title text-center" id="ModalName">Agregar amigo a la lista <i class="far fa-user fa-lg"></i></h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/add_friend" method="POST">
+            {% csrf_token %}
+          <div class="mb-3">
+            <label for="Nombre_local" class="form-label">Nombres</label>
+            <input type="text" class="form-control" name="nombres_friend" id="nombres_friend" placeholder="John" required>
+          </div>
+  
+          <div class="mb-3">
+            <label for="Nombre_local" class="form-label">Apellidos</label>
+            <input type="text" class="form-control" name="apellidos_friend" id="apellidos_friend" placeholder="Doe" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="Descripcion_local" class="form-label">Correo electronico (aca se le enviaran las facturas a tu amigo)</label>
+            <input type="email" class="form-control" name="email_friend" id="email_friend" placeholder="John.doe@mail.com" required></input>
+          </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" aria-current="page">Agregar amigo <i class="fas fa-user-plus fa-lg"></i></button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar <i class="fas fa-ban fa-lg"></i></button>
+        </div>
+      </form>
       </div>
     </div>
   </div>
-
-  <div class="card m-3">
-    <h3 class="card-header text-center" id="Sicilian_pizza">Pizza Sicilian</h3>
-    <div class="card-body">
-      <div class="card mb-3">
-        <div class="image">
-        <img src="/static/SicilianPizza.jpg" class="card-img-top rounded" alt="...">
-      </div>
-        <div class="card-body">
-          <!-- <h5 class="card-title">Card title</h5>
-          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card m-3">
-    <h3 class="card-header text-center"id="Toppings">Toppings</h3>
-    <div class="card-body">
-      <div class="card mb-3">
-        <div class="image">
-        <img src="/static/Toppings.jpg" class="card-img-top rounded" alt="...">
-      </div>
-        <div class="card-body">
-          <!-- <h5 class="card-title">Card title</h5>
-          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card m-3">
-    <h3 class="card-header text-center" id="Subs">Subs</h3>
-    <div class="card-body">
-      <div class="card mb-3">
-        <div class="image">
-        <img src="/static/Subs.jpg" class="card-img-top rounded" alt="...">
-      </div>
-        <div class="card-body">
-          <!-- <h5 class="card-title">Card title</h5>
-          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card m-3">
-    <h3 class="card-header text-center" id="Pasta">Pasta</h3>
-    <div class="card-body">
-      <div class="card mb-3">
-        <div class="image">
-        <img src="/static/Pasta.jpeg" class="card-img-top rounded" alt="...">
-      </div>
-        <div class="card-body">
-          <!-- <h5 class="card-title">Card title</h5>
-          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card m-3">
-    <h3 class="card-header text-center" id="Ensalada">Ensalada</h3>
-    <div class="card-body">
-      <div class="card mb-3">
-        <div class="image">
-        <img src="/static/Ensalada.jpg" class="card-img-top rounded" alt="...">
-      </div>
-        <div class="card-body">
-          <!-- <h5 class="card-title">Card title</h5>
-          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card m-3">
-    <h3 class="card-header text-center" id="Platillos_de_cena">Platillos de cena</h3>
-    <div class="card-body">
-      <div class="card mb-3">
-        <div class="image">
-        <img src="/static/Cena.webp" class="card-img-top rounded" alt="...">
-      </div>
-        <div class="card-body">
-          <!-- <h5 class="card-title">Card title</h5>
-          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
-        </div>
-      </div>
     </div>
   </div>
 </div>
 
-<button type="button" id="BackTop" class="toTop-arrow" style="z-index: 100;"></button>
+
+<div class="modal fade my-5 text-dark text-left pt-5" id="add_local" tabindex="1" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content ">
+      <div class="modal-header">
+        <h2 class="modal-title text-center" id="ModalName">Nuevo local <i class="fas fa-store fa-x2"></i></h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/add_local" method="POST">
+          {% csrf_token %}
+        <div class="mb-3">
+          <label for="Nombre_local" class="form-label">Nombre del establecimiento que visitaras</label>
+          <input type="text" class="form-control" name="nombre_local" id="Nombre_local" placeholder="Pizzeria de Mr mario los robles" required>
+        </div>
+        
+        <div class="mb-3">
+          <label for="Descripcion_local" class="form-label">Descripcion del establecimiento</label>
+          <textarea type="text" class="form-control" name="descripcion_local" id="Descripcion_local" placeholder="Hermosa pizzeria que ofrece platillos verdaderamente italianos como pizzas sicilianas y pizzas artesanales." required></textarea>
+        </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" aria-current="page">Agregar local <i class="fas fa-plus-circle fa-lg"></i></button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar <i class="fas fa-ban fa-lg"></i></button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+<button type="button" id="BackTop" class="toTop-arrow btn btn-primary" style="z-index: 100;"><i class="fas fa-chevron-up fa-2x"></i></button>
 
 <script>
     // Functions scrolling upwards
