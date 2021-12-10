@@ -11,8 +11,9 @@ class item(models.Model):
     nombre = models.CharField(max_length=64)                                                            # nombre del item ya sea una bebida alimento o articulo del local, el usuario decide
     descripcion = models.TextField(blank=True, null=True)                                               # una breve descripcion en caso de que el usuario desee detallar mas
     precio = models.DecimalField(decimal_places=2,max_digits=16)                                        # precio del item segun el menu del local
-    iva = models.BooleanField(default=False)                                                            # el producto require calcular iva por defecto no,se asume que ya los precios incluyen iva
+    iva = models.BooleanField(default=True)                                                            # el producto require calcular iva por defecto no,se asume que ya los precios incluyen iva
     monto_iva = models.DecimalField(default=0,decimal_places=2,max_digits=16,blank=True,null=True)      # en caso de que se tenga que calcular iva se almacena aca
+    usuario_main = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     class Meta:
         verbose_name= "Item"
         verbose_name_plural ="Items"
@@ -26,7 +27,7 @@ class cliente(models.Model):
     nombres = models.CharField(max_length=64)                                                           # nombres del cliente que acompaña al usuario
     apellidos = models.CharField(max_length=64)                                                         # apellidos del cliente que acompaña al usuario
     correo = models.EmailField(max_length=254,unique=True)                                              # correo electronico al que se enviara el detalle de la cuenta y su consumo personal
-    usuario_main = models.ForeignKey(User,on_delete=models.CASCADE)                                     # usuario que añade a su amigo,para evitar registros duplicados de un mismo usuario
+    usuario_main =  models.ForeignKey(User,on_delete=models.CASCADE)                                    # usuario que añade a su amigo,para evitar registros duplicados de un mismo usuario
     splits = models.ManyToManyField("cuenta",blank=True,related_name="splits_cliente",through="split")
     class Meta:
         verbose_name= "Cliente"
@@ -98,10 +99,10 @@ class local(models.Model):
 class consumo(models.Model):
     '''modelo que registra los consumos de un usuario'''
     item = models.ForeignKey(item,on_delete=models.CASCADE)                         # item que se esta consumiendo
-    cliente = models.ForeignKey(cliente,on_delete=models.CASCADE)                  # cliente que consume el item
+    cliente = models.ForeignKey(cliente,on_delete=models.CASCADE)                   # cliente que consume el item
     cuenta = models.ForeignKey(cuenta,on_delete=models.CASCADE)                     # cuenta en la que esta asociado el consumo
     consumo_disparejo  = models.BooleanField(default=False)                         # si un producto es de consumo disparejo una persona puede consumir mas que los demas por lo que cada usuario paga lo correspondiente a su consumo
-    cantidad = models.DecimalField(max_digits=16, decimal_places=2,default=0)       # cantidad en caso de que sea de consumo disparejo
+    cantidad = models.IntegerField(default=0)       # cantidad en caso de que sea de consumo disparejo
     monto = models.DecimalField(max_digits=16, decimal_places=2,default=0)          # monto que le corresponde en caso de que sea de consumo parejo sera divdir el precio del item entre los que consumen,en caso contrario seria el consumo multiplicado por el precio
     monto_iva = models.DecimalField(max_digits=16, decimal_places=2,default=0)      # monto que corresponde pagar a este 
     class Meta:

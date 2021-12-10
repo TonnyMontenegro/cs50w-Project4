@@ -47,8 +47,19 @@ def register_view(request):
 @login_required(login_url="login")
 def menu_view(request):
     context={}
-    context['amigos'] = cliente.objects.filter(usuario_main=request.user)
-    context['locales'] = local.objects.filter(creador=request.user)
+    usuario = cliente.objects.filter(correo=request.user.email).exists()
+    if usuario:
+        print("cliente de usuario ya existe")
+    else:
+        cliente.objects.create(usuario_main=request.user,nombres=request.user.first_name,apellidos=request.user.last_name,correo=request.user.email)
+
+    open = cuenta.objects.filter(usuario=request.user,estado="Abierta").exists()
+    if open:
+        cuentax = cuenta.objects.get(usuario=request.user,estado="Abierta")
+        return redirect(f"/bill/{cuentax.pk}")
+
+    context['amigos'] = cliente.objects.filter(usuario_main=request.user).exclude(correo=request.user.email).order_by('nombres')
+    context['locales'] = local.objects.filter(creador=request.user).order_by('nombre')
     return render(request,'menu.html',context)
 
 @csrf_protect
@@ -121,11 +132,6 @@ def add_friend(request):
         return redirect('home')
 
 @login_required(login_url="")
-def new_bill(request,pk):
-    if request.method == "POST":
-        return redirect('home')
-
-@login_required(login_url="")
 def edit_friend(request,pk):
     if request.method == "POST":
         nombres = request.POST.get('nombres_friend_edit')
@@ -141,8 +147,57 @@ def edit_friend(request,pk):
             amigo.nombres = nombres
             amigo.apellidos = apellidos
             amigo.correo = correo
-            amigo.save
+            amigo.save()
             messages.info(request,"amigo editado con exito")
             
         
+        return redirect('home')
+
+@login_required(login_url="")
+def new_bill(request,pk):
+    if request.method == "POST":
+        clientes=request.POST.getlist('FriendBox')
+        user=cliente.objects.get(correo=request.user.email)
+        clientes.append(user.pk)
+        alias=request.POST.get('alias')
+
+        locals = local.objects.get(pk=pk)
+
+        cuenta.objects.create(alias=alias,local=locals,usuario=request.user)
+        clientex=[]
+        for x in range(0,len(clientes)):
+            clientex.append(cliente.objects.get(pk=clientes[x]))
+        cuenta.objects.filter(usuario=request.user).last().clientes.add(*clientex)
+        context={}
+
+        context['clientes'] = clientex
+        context['local'] = locals
+        return redirect(f"/bill/{pk}" ,context)
+
+@login_required(login_url="")
+def bill(request,pk):
+    context={}
+    open = cuenta.objects.filter(usuario=request.user,estado="Abierta").exists()
+    if open:
+        cuentax = cuenta.objects.get(usuario=request.user,estado="Abierta")
+        context['cuenta'] = cuentax
+        context['clientes'] = cuentax.clientes.all()
+        context['items'] = item.objects.filter(usuario_main=request.user)
+    return render(request,"bill.html",context)
+
+@login_required(login_url="")
+def add_item(request):
+    if request.method == "POST":
+        nombre = request.POST.get('nombre_item')
+        descripcion = request.POST.get('descripcion_item')
+        precio = request.POST.get('precio_item')
+        iva = request.POST.get('incluye_iva_item')
+        if iva is None:
+            precio_iva = float(precio) * 0.15
+            item.objects.create(nombre=nombre,descripcion=descripcion,precio=precio,iva=False,monto_iva=precio_iva,usuario_main=request.user)
+            
+        else:
+            item.objects.create(nombre=nombre,descripcion=descripcion,precio=precio,usuario_main=request.user)
+
+
         return redirect('home')

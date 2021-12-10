@@ -24,16 +24,16 @@
 			  <div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav ml-auto">
 					{% if user.is_authenticated %}
-						<li><a href="home" class="nav-item nav-link ">Menu principal</a></li>
-						<li><a href="history" class="nav-item nav-link ">ver historial</a></li>
-						<li><a href="about" class="nav-item nav-link ">Acerca de split</a></li>
-						<li><a href="logout" class="nav-item nav-link ">Cerrar sesion</a></li>
+						<li><a href="/home" class="nav-item nav-link ">Menu</a></li>
+						<li><a href="/history" class="nav-item nav-link ">historial</a></li>
+						<li><a href="/about" class="nav-item nav-link ">Acerca de split</a></li>
+						<li><a href="/logout" class="nav-item nav-link ">Cerrar sesion</a></li>
 
 						<li class="UserName "><p class="nav-link mx-2"> Hola {{ user.first_name }} {{ user.last_name }}</p></li>
 					{% else %}
-						<li><a href="register" class="nav-item nav-link ">Registrarse</a></li>
-						<li><a href="login" class="nav-item nav-link ">Iniciar sesion</a></li>
-						<li><a href="about" class="nav-item nav-link ">acerca de split</a></li>
+						<li><a href="/register" class="nav-item nav-link ">Registrarse</a></li>
+						<li><a href="/login" class="nav-item nav-link ">Iniciar sesion</a></li>
+						<li><a href="/about" class="nav-item nav-link ">acerca de split</a></li>
 					{% endif %}
 				</ul>
 			</div>

@@ -1,0 +1,170 @@
+{% extends "layout.html" %}
+{% block Title %} Historial {% endblock %}
+{% block body %} 
+
+<div class="container bg-light Menu rounded py-5 shadow-lg">
+    
+    <ul class="nav nav-pills nav-justified " id="pills-tab" role="tablist">
+        <li class="nav-item p-2" role="presentation">
+          <button class="nav-link active btn-lg" id="pills-general-tab" data-bs-toggle="pill" data-bs-target="#pills-general" type="button" role="tab" aria-controls="pills-general" aria-selected="true">Cuenta <i class="fas fa-file-invoice-dollar fa-lg"></i></button>
+        </li>
+        <li class="nav-item p-2" role="presentation">
+          <button class="nav-link btn-lg" id="pills-split-tab" data-bs-toggle="pill" data-bs-target="#pills-split" type="button" role="tab" aria-controls="pills-split" aria-selected="false">Split <i class="fas fa-wallet fa-lg"></i></button>
+        </li>
+        <li class="nav-item p-2" role="presentation">
+          <button class="nav-link btn-lg" id="pills-items-tab" data-bs-toggle="pill" data-bs-target="#pills-items" type="button" role="tab" aria-controls="pills-items" aria-selected="false">Items <i class="far fa-list-alt fa-lg"></i></button>
+        </li>
+      </ul>
+    
+    
+      <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-general" role="tabpanel" aria-labelledby="pills-general-tab">
+          <table class="table text-light table-dark table-hover">
+            <thead>
+              <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>subtotal</th>
+            <th>IVA</th>
+          </tr>
+            </thead>
+        <tbody>
+      <!-- {% for cena in Cenas %} -->
+      <tr>
+        <th>Nombre2</th>
+        <th>Precio2</th>
+        <th>Cantidad</th>
+        <th>subtotal</th>
+        <th>IVA</th>
+      </tr>
+      
+      <!-- {% endfor %} -->
+          </tbody>
+          </table>
+
+
+        </div>
+    
+        <div class="tab-pane fade" id="pills-split" role="tabpanel" aria-labelledby="pills-split-tab">
+            xda
+        </div>
+
+        <div class="tab-pane fade" id="pills-items" role="tabpanel" aria-labelledby="pills-items-tab">
+          <div class="row row-cols-1 my-2 row-cols-md-2 g-5">
+
+            <div class="col">
+              <div class="card about-card shadow-lg border-primary">
+                  <div class="card-body text-left">
+                      <h3><strong>Nombre:</strong> el nombre con el que deseas agregar ese item</h3>
+                    <p class="card-text"><strong>Descripcion:</strong> Una breve descripcion para que puedas recordar que producto es exactamente.</p>
+                    <p class="card-text"><strong>Precio:</strong> el precio que aparece en el menu del local.</p>
+                    <p class="card-text"><strong>Precio incluye iva:</strong> <i class="fas fa-check-square fa-x3"></i> (si no incluye iva no te preocupes split lo calcula por ti)</p>
+                    <div class="container text-center">
+                      <button class="btn btn-secondary btn-lg m-3" data-bs-toggle="modal" data-bs-target="#add_item">Agregar nuevo item <i class="fas fa-plus-circle fa-lg"></i></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {% for item in items %}
+              <div class="col">
+                <div class="card about-card shadow-lg border-primary">
+                    <div class="card-body text-center">
+                        <h3>{{ item.nombre }}</h3>
+                      <p class="card-text">{{ item.descripcion }}</p>
+                      <p class="card-text">{{ item.precio }}$ {%if not item.iva %} + {{item.monto_iva}}$(IVA) {%endif%} </p>
+                      <div class="container text-center">
+                        <button class="btn btn-secondary btn-lg m-3" data-bs-toggle="modal" data-bs-target="#order_item">Ordenar este item <i class="fas fa-cart-plus fa-lg"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="modal fade my-5 text-dark text-left pt-5" id="order_item" tabindex="1" aria-labelledby="ModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content ">
+                      <div class="modal-header">
+                        <h2 class="modal-title text-center" id="ModalName">Agregar orden de este producto <i class="fas fa-cart-plus fa-lg"></i></h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form action="/order_item/{{item.pk}}" method="POST">
+                          {% csrf_token %}
+                        <div class="mb-3">
+                          <label for="nombre_item" class="form-label">Nombre</label>
+                          <input type="text" class="form-control" name="nombre_item" id="nombre_item" placeholder="Alitas picantes" required>
+                        </div>
+                
+                        <div class="mb-3">
+                          <label for="descripcion_item" class="form-label">Descripcion</label>
+                          <textarea type="text" class="form-control" name="descripcion_item" id="descripcion_item" placeholder="Alitas picantes de BullChunksNI con papas y queso derretido." required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                          <label for="precio_item" class="form-label">Correo electronico (aca se le enviaran las facturas a tu amigo)</label>
+                          <input type="number" min="0" value="" placeholder="512.75" step="0.1" class="form-control" name="precio_item" id="precio_item" required></input>
+                        </div>
+                        <div class="form-check">
+                          <label class="form-check-label" for="incluye_iva_item">
+                            IVA incluido en precio
+                          </label>
+                          <input class="form-check-input" type="checkbox" name="incluye_iva_item" value="incluye" id="incluye_iva_item" checked>
+                        </div>
+                      <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary" aria-current="page">Agregar item <i class="fas fa-plus-circle fa-lg"></i></button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar <i class="fas fa-ban fa-lg"></i></button>
+                      </div>
+                    </form>
+                    </div>
+                  </div>
+                </div>
+                  </div>
+
+              {% endfor %}
+
+              <div class="modal fade my-5 text-dark text-left pt-5" id="add_item" tabindex="1" aria-labelledby="ModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content ">
+                    <div class="modal-header">
+                      <h2 class="modal-title text-center" id="ModalName">Agregar item a la lista <i class="fas fa-plus-circle "></i></h2>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form action="/add_item" method="POST">
+                        {% csrf_token %}
+                      <div class="mb-3">
+                        <label for="nombre_item" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" name="nombre_item" id="nombre_item" placeholder="Alitas picantes" required>
+                      </div>
+              
+                      <div class="mb-3">
+                        <label for="descripcion_item" class="form-label">Descripcion</label>
+                        <textarea type="text" class="form-control" name="descripcion_item" id="descripcion_item" placeholder="Alitas picantes de BullChunksNI con papas y queso derretido." required></textarea>
+                      </div>
+                      
+                      <div class="mb-3">
+                        <label for="precio_item" class="form-label">Correo electronico (aca se le enviaran las facturas a tu amigo)</label>
+                        <input type="number" min="0" value="" placeholder="512.75" step="0.1" class="form-control" name="precio_item" id="precio_item" required></input>
+                      </div>
+                      <div class="form-check">
+                        <label class="form-check-label" for="incluye_iva_item">
+                          IVA incluido en precio
+                        </label>
+                        <input class="form-check-input" type="checkbox" name="incluye_iva_item" value="incluye" id="incluye_iva_item" checked>
+                      </div>
+                    <div class="modal-footer">
+                      <button type="submit" class="btn btn-primary" aria-current="page">Agregar item <i class="fas fa-plus-circle fa-lg"></i></button>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar <i class="fas fa-ban fa-lg"></i></button>
+                    </div>
+                  </form>
+                  </div>
+                </div>
+              </div>
+                </div>
+
+      </div>
+    </div>
+
+{% endblock %}

@@ -28,6 +28,8 @@ urlpatterns = [
     path('add_local',views.add_local,name='add_local'),
     path('remove_local/<int:pk>',views.remove_local,name='remove_local'),
     path('add_friend',views.add_friend,name='add_friend'),
-    path('new_bill',views.new_bill,name='new_bill'),
-    path('edit_friend/<int:pk>', views.edit_friend ,name="edit_friend"),
+    path('add_item',views.add_item,name='add_item'),
+    path('new_bill/<int:pk>',views.new_bill,name='new_bill'),
+    path('edit_friend/<int:pk>',views.edit_friend ,name="edit_friend"),
+    path('bill/<int:pk>',views.bill,name='bill'),
 ]

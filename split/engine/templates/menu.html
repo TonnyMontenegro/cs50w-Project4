@@ -52,7 +52,7 @@
               <h3>{{ local.nombre }}:</h3>
             <p class="card-text">{{ local.descripcion }}</p>
             <div class="container text-center">
-              <a href="/bills/{{local.pk}}/" class="btn btn-secondary btn-sm m-3">Abrir nueva cuenta <i class="fas fa-file-invoice-dollar fa-lg"></i></a>
+              <button data-bs-toggle="modal" data-bs-target="#new_bill{{local.pk}}"  class="btn btn-secondary btn-sm m-3">Abrir nueva cuenta <i class="fas fa-file-invoice-dollar fa-lg"></i></button>
               <button data-bs-toggle="modal" data-bs-target="#Remove_{{local.pk}}" class="btn btn-danger btn-sm  m-3">Eliminar <i class="fas fa-trash-alt fa-x2"></i></button>
             </div>
           </div>
@@ -80,7 +80,7 @@
         </div>
       </div>
 
-      <div class="modal fade" id="new_bill_{{local.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal fade" id="new_bill{{local.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -88,13 +88,27 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <h4>No solo eliminaras el local sino tambian sus cuentas asociadas y todo lo relacionado a el, aun asi deseeas continuar</h4>
+              <div class="mb-3">
+                <form action="/new_bill/{{local.pk}}" onsubmit="CheckFriends(event)" method="POST">
+                {% csrf_token %}
+                <label for="alias" class="form-label">Ocacion/alias de cuenta</label>
+                <input type="text" class="form-control" name="alias" id="alias" value="{{amigo.nombres}}" placeholder="Cumpleaños de John Doe" required>
+              </div>
+              <hr>
+              <h3>Amigos que estaran presentes</h3>
+              {% for amigo in amigos %}
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="FriendBox" value="{{amigo.pk}}" id="{{amigo.pk}}">
+                <label class="form-check-label" for="{{amigo.pk}}">
+                  {{amigo.nombres}} {{amigo.apellidos}}: {{amigo.correo}}
+                </label>
+              </div>
+              {% endfor %}
             </div>
             <div class="modal-footer">
-              <form action="/remove_local/{{local.pk}}" method="POST">
-                {% csrf_token %}
+              
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-danger">Si,deseeo eliminarlo</button>
+              <button type="submit" class="btn btn-primary">Crear cuenta <i class="fas fa-file-invoice-dollar fa-lg"></i></button>
             </form>
             </div>
           </div>
@@ -143,21 +157,21 @@
               <form action="/edit_friend/{{amigo.pk}}" method="POST">
                 {% csrf_token %}
                 <div class="mb-3">
-                  <label for="Nombre_local" class="form-label">Nombres</label>
-                  <input type="text" class="form-control" name="nombres_friend_edit" id="nombres_friend" value="{{amigo.nombres}}" placeholder="John" required>
+                  <label for="nombres_friend_edit" class="form-label">Nombres</label>
+                  <input type="text" class="form-control" name="nombres_friend_edit" id="nombres_friend_edit" value="{{amigo.nombres}}" placeholder="John" required>
                 </div>
         
                 <div class="mb-3">
-                  <label for="Nombre_local" class="form-label">Apellidos</label>
-                  <input type="text" class="form-control" name="apellidos_friend_edit" id="apellidos_friend" value="{{amigo.apellidos}}" placeholder="Doe" required>
+                  <label for="apellidos_friend_edit" class="form-label">Apellidos</label>
+                  <input type="text" class="form-control" name="apellidos_friend_edit" id="apellidos_friend_edit" value="{{amigo.apellidos}}" placeholder="Doe" required>
                 </div>
                 
                 <div class="mb-3">
-                  <label for="Descripcion_local" class="form-label">Correo electronico (aca se le enviaran las facturas a tu amigo)</label>
-                  <input type="email" class="form-control" name="email_friend_edit" value="{{amigo.correo}}" id="email_friend" placeholder="John.doe@mail.com" required></input>
+                  <label for="email_friend_edit" class="form-label">Correo electronico (aca se le enviaran las facturas a tu amigo)</label>
+                  <input type="email" class="form-control" name="email_friend_edit" value="{{amigo.correo}}" id="email_friend_edit" placeholder="John.doe@mail.com" required></input>
                 </div>
               <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" aria-current="page">editar amigo <i class="fas fa-user-plus fa-lg"></i></button>
+                <button type="submit" class="btn btn-primary" aria-current="page">editar amigo <i class="fas fa-user-edit fa-lg"></i></button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar <i class="fas fa-ban fa-lg"></i></button>
               </div>
             </form>
@@ -236,6 +250,15 @@
 <button type="button" id="BackTop" class="toTop-arrow btn btn-primary" style="z-index: 100;"><i class="fas fa-chevron-up fa-2x"></i></button>
 
 <script>
+
+function CheckFriends(event){
+  contador=$('[name="FriendBox"]:checked').length
+    if(contador < 1){
+        alert("Hey, selecciona al menos un amigo");
+        event.preventDefault();
+    }
+}
+
     // Functions scrolling upwards
     $(function () {
         $('#BackTop').click(function () {
