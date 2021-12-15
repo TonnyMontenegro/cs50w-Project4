@@ -29,7 +29,9 @@ urlpatterns = [
     path('remove_local/<int:pk>',views.remove_local,name='remove_local'),
     path('add_friend',views.add_friend,name='add_friend'),
     path('add_item',views.add_item,name='add_item'),
+    path('order_item/<int:pk>',views.order_item,name='order_item'),
     path('new_bill/<int:pk>',views.new_bill,name='new_bill'),
     path('edit_friend/<int:pk>',views.edit_friend ,name="edit_friend"),
     path('bill/<int:pk>',views.bill,name='bill'),
+    path('delete_order/<int:pk>',views.delete_orden,name='delete_orden'),
 ]

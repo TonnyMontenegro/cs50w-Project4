@@ -3,6 +3,22 @@
 {% block body %} 
 
 <div class="container bg-light Menu rounded py-5 shadow-lg">
+
+
+  {% if messages %}
+  <div class="row m-2">
+  <div class="col-lg text-center">
+      {% for message in messages %}
+      <div class="alert alert-dismissible fade show alert-{{ message.tags }}" role="alert">
+          <p>{{ message }}</p>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+{% endif %}
+
     
     <ul class="nav nav-pills nav-justified " id="pills-tab" role="tablist">
         <li class="nav-item p-2" role="presentation">
@@ -17,7 +33,7 @@
       </ul>
     
     
-      <div class="tab-content" id="pills-tabContent">
+      <div class="tab-content overflow" id="pills-tabContent">
         <div class="tab-pane fade show active" id="pills-general" role="tabpanel" aria-labelledby="pills-general-tab">
           <table class="table text-light table-dark table-hover">
             <thead>
@@ -25,21 +41,57 @@
             <th>Nombre</th>
             <th>Precio</th>
             <th>Cantidad</th>
+            <th>Tipo</th>
             <th>subtotal</th>
-            <th>IVA</th>
+            <th>+IVA</th>
+            <th> </th>
           </tr>
             </thead>
         <tbody>
-      <!-- {% for cena in Cenas %} -->
+      {% for orden in ordenes %}
       <tr>
-        <th>Nombre2</th>
-        <th>Precio2</th>
-        <th>Cantidad</th>
-        <th>subtotal</th>
-        <th>IVA</th>
+        <th>{{orden.item.nombre}}</th>
+        <th>{{orden.item.precio}} $</th>
+        <th>{{orden.cantidad_total }}</th>
+        <th>{% if orden.dividido%}Orden dividida{% else %}Consumo individual{%endif%}</th>
+        <th>{{orden.subtotal }} $</th>
+        <th>{{orden.subtotal_iva}} $</th>
+        <th><button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#Delete_{{orden.pk}}" ><i class="fas fa-trash-alt fa-lg"></i></button></th>
       </tr>
+
+      <div class="modal fade my-5 text-dark text-left pt-5" id="Delete_{{orden.pk}}" tabindex="1" aria-labelledby="ModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content ">
+            <div class="modal-header">
+              <h2 class="modal-title text-center" id="ModalName">Eliminar orden<i class="fas fa-eraser fa-lg"></i></h2>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h3 class="text-center">Esta seguro que desea eliminar esta orden de su cuenta?</h3>
+            <div class="modal-footer">
+            <form action="/delete_order/{{orden.pk}}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary" aria-current="page">Si, eliminar<i class="fas fa-trash-alt fa-lg"></i></button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar <i class="fas fa-ban fa-lg"></i></button>
+            </form>
+          </div>
+          </form>
+          </div>
+        </div>
+      </div>
+        </div>
       
-      <!-- {% endfor %} -->
+      {% endfor %}
+
+      <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th>{{cuenta.subtotal}} $</th>
+        <th>{{cuenta.total}} $</th>
+        <th><button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#Delete_{{orden.pk}}" ><i class="fas fa-trash-alt fa-lg"></i></button></th>
+      </tr>
           </tbody>
           </table>
 
@@ -47,7 +99,26 @@
         </div>
     
         <div class="tab-pane fade" id="pills-split" role="tabpanel" aria-labelledby="pills-split-tab">
-            xda
+          <table class="table text-light table-dark table-hover">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Correo</th>
+                <th>Split</th>
+              </tr>
+                </thead>
+            <tbody>
+          {% for split in splits %}
+          <tr>
+            <th>{{split.cliente.nombres}}</th>
+            <th>{{split.cliente.apellidos}}</th>
+            <th>{{split.cliente.correo}}</th>
+            <th>{{split.monto}} $</th>
+          </tr>    
+          {% endfor %}
+          </tbody>
+          </table>
         </div>
 
         <div class="tab-pane fade" id="pills-items" role="tabpanel" aria-labelledby="pills-items-tab">
@@ -75,43 +146,45 @@
                       <p class="card-text">{{ item.descripcion }}</p>
                       <p class="card-text">{{ item.precio }}$ {%if not item.iva %} + {{item.monto_iva}}$(IVA) {%endif%} </p>
                       <div class="container text-center">
-                        <button class="btn btn-secondary btn-lg m-3" data-bs-toggle="modal" data-bs-target="#order_item">Ordenar este item <i class="fas fa-cart-plus fa-lg"></i></button>
+                        <button class="btn btn-secondary btn-lg m-3" data-bs-toggle="modal" data-bs-target="#order_item_{{item.pk}}">Ordenar este item <i class="fas fa-cart-plus fa-lg"></i></button>
                       </div>
                     </div>
                   </div>
                 </div>
 
 
-                <div class="modal fade my-5 text-dark text-left pt-5" id="order_item" tabindex="1" aria-labelledby="ModalLabel" aria-hidden="true">
+                <div class="modal fade my-5 text-dark text-left pt-5" id="order_item_{{item.pk}}" tabindex="1" aria-labelledby="ModalLabel" aria-hidden="true">
                   <div class="modal-dialog modal-lg">
                     <div class="modal-content ">
                       <div class="modal-header">
-                        <h2 class="modal-title text-center" id="ModalName">Agregar orden de este producto <i class="fas fa-cart-plus fa-lg"></i></h2>
+                        <h2 class="modal-title text-center" id="ModalName">Agregar orden <i class="fas fa-cart-plus fa-lg"></i></h2>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                        <form action="/order_item/{{item.pk}}" method="POST">
+                        <form action="/order_item/{{item.pk}}" method="POST" onsubmit="CheckOrder(event)">
                           {% csrf_token %}
-                        <div class="mb-3">
-                          <label for="nombre_item" class="form-label">Nombre</label>
-                          <input type="text" class="form-control" name="nombre_item" id="nombre_item" placeholder="Alitas picantes" required>
-                        </div>
-                
-                        <div class="mb-3">
-                          <label for="descripcion_item" class="form-label">Descripcion</label>
-                          <textarea type="text" class="form-control" name="descripcion_item" id="descripcion_item" placeholder="Alitas picantes de BullChunksNI con papas y queso derretido." required></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                          <label for="precio_item" class="form-label">Correo electronico (aca se le enviaran las facturas a tu amigo)</label>
-                          <input type="number" min="0" value="" placeholder="512.75" step="0.1" class="form-control" name="precio_item" id="precio_item" required></input>
-                        </div>
+                        <div class="m-3"><h3>{{item.nombre}}: {{item.precio}}$ {%if not item.iva %} + {{item.monto_iva}}$(IVA) {%endif%}</h3></div>
                         <div class="form-check">
-                          <label class="form-check-label" for="incluye_iva_item">
-                            IVA incluido en precio
+                          <label class="form-check-label" for="Consumo_individual">
+                            Consumo individual
                           </label>
-                          <input class="form-check-input" type="checkbox" name="incluye_iva_item" value="incluye" id="incluye_iva_item" checked>
+                          <input class="form-check-input Consumo_individual" onclick="EnableDisable(this)" type="checkbox" name="Consumo_individual" value="individual" id="Consumo_individual_check" checked>
                         </div>
+                        <div class="row m-3">
+                          <label for="num_divided" class="col-3 col-form-label divided" hidden>Cantidad de items a compartir</label>
+                          <div class="col-2">
+                          <input type="number" min="1" value=1 name="num_divided" class="form-control divided" id="num_divided" placeholder="" hidden required>
+                          </div>
+                        </div>
+                        {% for cliente in clientes %}
+                        <div class="row m-3">
+                          <label for="{{cliente.pk}}-lb" class="col-sm-3 col-form-label">{{cliente.nombres}} {{cliente.apellidos}}</label>
+                          <div class="col-2" id="{{cliente.pk}}-lb">
+                            <input type="number" class="num" min="0" value=0 name="num" class="form-control" id="{{cliente.pk}}-num" placeholder="" required>
+                            <input class="form-check-input check" type="checkbox" name="check" value="{{cliente.pk}}" id="{{cliente.pk}}-check" hidden>
+                          </div>
+                        </div>
+                        {%endfor%}
                       <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" aria-current="page">Agregar item <i class="fas fa-plus-circle fa-lg"></i></button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar <i class="fas fa-ban fa-lg"></i></button>
@@ -167,4 +240,49 @@
       </div>
     </div>
 
+<script>
+
+function EnableDisable(option) {
+if (option.checked) {
+  $('.num').attr("hidden",false);
+  $('.check').attr("hidden",true);
+  $(".Consumo_individual").prop( "checked", true );
+  $(".divided").attr("hidden",true);
+
+} else {
+
+  $('.num').attr("hidden",true);
+  $('.check').attr("hidden",false);
+  $(".Consumo_individual").prop( "checked", false );
+  $(".divided").attr("hidden",false);
+
+}             
+}   
+
+function CheckOrder(event){
+  if($("#Consumo_individual_check").prop("checked")){
+    var valid = false;
+      $(".num").each(function(){
+        if(this.value != 0){
+          valid = true;
+        }
+      });
+      if (valid){
+        console.log("todo bien joven")
+      }
+      else{
+        event.preventDefault();
+        alert("Debes seleccionar el consumo para al menos una persona.")
+      }
+  }
+  else{
+    contador=$('[name="check"]:checked').length
+    if(contador < 2){
+        alert("Debes seleccionar el consumo para al menos dos persona.");
+        event.preventDefault();
+    }
+  }
+}
+
+</script>
 {% endblock %}

@@ -9,6 +9,7 @@ from .forms import UserRegisterForm
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.views.defaults import page_not_found
+from django.db.models import Sum
 
 # Create your views here.
 
@@ -49,7 +50,7 @@ def menu_view(request):
     context={}
     usuario = cliente.objects.filter(correo=request.user.email).exists()
     if usuario:
-        print("cliente de usuario ya existe")
+        print("URL menu_view: Usuario ya existe en clientes")
     else:
         cliente.objects.create(usuario_main=request.user,nombres=request.user.first_name,apellidos=request.user.last_name,correo=request.user.email)
 
@@ -95,7 +96,6 @@ def add_local(request):
     if request.method == "POST":
         Nombre_local = request.POST.get('nombre_local')
         descripcion_local = request.POST.get('descripcion_local')
-        print(Nombre_local)
         existe = local.objects.filter(creador=request.user,nombre=Nombre_local).exists()
         
         if existe:
@@ -180,9 +180,21 @@ def bill(request,pk):
     open = cuenta.objects.filter(usuario=request.user,estado="Abierta").exists()
     if open:
         cuentax = cuenta.objects.get(usuario=request.user,estado="Abierta")
+        context['ordenes'] = orden.objects.filter(cuenta=cuentax).all()
         context['cuenta'] = cuentax
         context['clientes'] = cuentax.clientes.all()
         context['items'] = item.objects.filter(usuario_main=request.user)
+        context['splits'] = split.objects.filter(cuenta=cuentax).order_by('cliente')
+
+        obj = orden.objects.filter(cuenta=cuentax).all().aggregate(Sum('subtotal'))
+        subtotal= obj['subtotal__sum']
+        obj = orden.objects.filter(cuenta=cuentax).all().aggregate(Sum('subtotal_iva'))
+        subtotal_iva= obj['subtotal_iva__sum']
+
+        cuentax.subtotal = subtotal
+        cuentax.total = subtotal_iva
+        cuentax.save()
+
     return render(request,"bill.html",context)
 
 @login_required(login_url="")
@@ -201,3 +213,97 @@ def add_item(request):
 
 
         return redirect('home')
+
+@login_required(login_url="")
+def order_item(request,pk):
+    if request.method == "POST":
+        cuentax = cuenta.objects.filter(usuario=request.user,estado="Abierta").last()
+        clienteslist= cuentax.clientes.values("pk")
+
+        for clientei in clienteslist:
+            cliente_inst=cliente.objects.get(pk=clientei['pk'])
+            split_state = split.objects.filter(cuenta=cuentax,cliente=cliente_inst).exists()
+            if split_state:
+                print("URL order_item: Split ya existe")
+            else:
+                split.objects.create(cuenta=cuentax,cliente=cliente_inst)
+        
+
+        itemorder = item.objects.get(pk=pk)
+        Consumo = request.POST.get('Consumo_individual',"compartida")
+        if Consumo == "individual":
+            orden.objects.create(item=itemorder,cuenta=cuentax)
+            ordenx = orden.objects.filter(item=itemorder,cuenta=cuentax).last()
+            numbers=request.POST.getlist('num')
+            clientesInsert = []
+            for clientei in clienteslist:
+                clientesInsert.append(cliente.objects.get(pk=clientei['pk']))
+            for x in range(0,len(numbers)):
+                if int(numbers[x])>0:
+                    splitx = split.objects.get(cuenta=cuentax,cliente=clientesInsert[x])
+                    consumo.objects.create(cliente=clientesInsert[x],cantidad=numbers[x],orden=ordenx,split=splitx)
+                    splitx.monto = float(splitx.monto)+((float(itemorder.precio) + float(itemorder.monto_iva))*float(numbers[x]))
+                    splitx.save()
+            numbers_int = [int(i) for i in numbers]
+            ordenx.subtotal = sum(numbers_int)*float(itemorder.precio)
+            ordenx.cantidad_total = sum(numbers_int)
+            if itemorder.iva == False:
+                ordenx.subtotal_iva = (float(ordenx.subtotal)*0.15)+float(ordenx.subtotal)
+            else:
+                 ordenx.subtotal_iva = ordenx.subtotal
+            ordenx.save()
+            
+        else:
+            num = request.POST.get('num_divided','1')
+            orden.objects.create(item=itemorder,cuenta=cuentax,dividido=True,cantidad_total=int(num))
+            subtotal=float(num)*(float(itemorder.precio))
+
+            if itemorder.iva == False:
+                subtotal_iva = (subtotal*0.15)+subtotal
+            else:
+                subtotal_iva = subtotal
+
+            ordenx = orden.objects.filter(item=itemorder,cuenta=cuentax).last()
+            ordenx.subtotal=subtotal
+            ordenx.subtotal_iva=subtotal_iva
+            ordenx.save()
+            numbers=request.POST.getlist('check')
+            splited = float(ordenx.subtotal_iva) / float(len(numbers)) 
+            for x in range(0,len(numbers)):
+                clienteinst = cliente.objects.get(pk=numbers[x])
+                splitx = split.objects.get(cuenta=cuentax,cliente=clienteinst)
+                consumo.objects.create(cliente=clienteinst,orden=ordenx,split=splitx)
+                splitx.monto = float(splitx.monto)+float(splited)
+                splitx.save()
+
+        return redirect('home')
+
+@login_required(login_url="")
+def delete_orden(request,pk):
+    if request.method == "POST":
+        Exist = orden.objects.exists()
+        if Exist:
+            ordenx = orden.objects.get(pk=pk)
+            if ordenx.dividido == True:
+                splited = float(ordenx.subtotal_iva) / float(consumo.objects.filter(orden=ordenx).count()) 
+                consumosx = consumo.objects.filter(orden=ordenx).all()
+                for x in consumosx:
+                    splitinst = split.objects.get(pk=x.split.pk)
+                    splitinst.monto = float(splitinst.monto) - splited
+                    print(f"URL: order_delete: Cantidad total #{ordenx.cantidad_total}")       
+                    splitinst.save()
+            else:
+                consumosx = consumo.objects.filter(orden=ordenx).all()
+                itemorder= ordenx.item
+                for x in consumosx:
+                    splited = float(x.cantidad) * (float(itemorder.precio) + float(itemorder.monto_iva))
+                    splitinst = split.objects.get(pk=x.split.pk)
+                    splitinst.monto = float(splitinst.monto) - splited
+                    print(f"URL: order_delete: Cantidad total #{ordenx.cantidad_total}")       
+                    splitinst.save()
+            
+            orden.objects.filter(pk=pk).delete()
+            messages.info(request,"Orden removida de su factura")
+        else:
+            messages.error(request,"Error, la orden no existe")
+    return redirect('home')

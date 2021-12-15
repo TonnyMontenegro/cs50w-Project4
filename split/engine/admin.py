@@ -23,11 +23,16 @@ class LocalAdmin(admin.ModelAdmin):
     search_choices=("nombre", "creador")
     search_fields=("nombre", "creador","descripcion")
 
+class OrdenAdmin(admin.ModelAdmin):
+    list_display=("item", "cuenta","dividido")
+    search_choices=("item", "cuenta","dividido")
+    search_fields=("item",)
+    list_filter=("dividido",)
+
 class ConsumoAdmin(admin.ModelAdmin):
-    list_display=("item", "cliente","cuenta","consumo_disparejo","cantidad","monto","monto_iva")
-    search_choices=("item", "cliente","cuenta","consumo_disparejo","cantidad","monto","monto_iva")
-    search_fields=("item", "cliente")
-    list_filter=("consumo_disparejo",)
+    list_display=("cliente", "cantidad")
+    search_choices=("cliente", "cantidad")
+    search_fields=("cliente",)
 
 class SplitAdmin(admin.ModelAdmin):
     list_display=("cuenta", "monto","propina","cliente")
@@ -38,5 +43,6 @@ admin.site.register(item,ItemAdmin)
 admin.site.register(cliente,ClienteAdmin)
 admin.site.register(cuenta,CuentaAdmin)
 admin.site.register(local,LocalAdmin)
+admin.site.register(orden,OrdenAdmin)
 admin.site.register(consumo,ConsumoAdmin)
 admin.site.register(split,SplitAdmin)

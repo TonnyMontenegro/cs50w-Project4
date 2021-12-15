@@ -111,27 +111,27 @@ body {
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 400px){
   html{
-    font-size: 80%;
+    font-size: 55%;
   }
 }
 
 @media only screen and (min-width: 400px){
   html{
-    font-size: 84%;
+    font-size: 65%;
   }
 }
 
 /* Small devices (portrait tablets and large phones, 600px and up) */
 @media only screen and (min-width: 600px) {
   html{
-    font-size: 88%;
+    font-size: 75%;
   }
 }
 
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 768px) {
   html{
-    font-size: 90%;
+    font-size: 85%;
   }
 }
 
@@ -165,6 +165,10 @@ body {
   background-color: #810ae9 !important;
   border-color: #810ae9 !important;
   color: rgb(255, 255, 255);
+}
+
+.overflow{
+  overflow: auto;
 }
 
 .nav-link{
