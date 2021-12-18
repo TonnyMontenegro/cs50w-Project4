@@ -15,7 +15,7 @@
     
     <nav class="navbar navbar-expand-md navbar-dark">
 		<div class="container">
-			<a href="home" class="navbar-brand">
+			<a href="/home" class="navbar-brand">
 				<img src="/static/SplitLogo.png" alt="Logo Split" height="50vh">
 			</a>
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,10 +24,17 @@
 			  <div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav ml-auto">
 					{% if user.is_authenticated %}
-						<li><a href="/home" class="nav-item nav-link ">Menu</a></li>
-						<li><a href="/history" class="nav-item nav-link ">historial</a></li>
-						<li><a href="/about" class="nav-item nav-link ">Acerca de split</a></li>
-						<li><a href="/logout" class="nav-item nav-link ">Cerrar sesion</a></li>
+						{% if open %}
+							<li><a href="/home" class="nav-item nav-link ">Cuenta existente</a></li>
+							<li><a href="/about" class="nav-item nav-link ">Acerca de split</a></li>
+							<li><a href="/logout" class="nav-item nav-link ">Cerrar sesion</a></li>
+						{% else %}
+							<li><a href="/home" class="nav-item nav-link ">Menu</a></li>
+							<li><a href="/history" class="nav-item nav-link ">historial</a></li>
+							<li><a href="/about" class="nav-item nav-link ">Acerca de split</a></li>
+							<li><a href="/logout" class="nav-item nav-link ">Cerrar sesion</a></li>
+						{% endif %}
+						
 
 						<li class="UserName "><p class="nav-link mx-2"> Hola {{ user.first_name }} {{ user.last_name }}</p></li>
 					{% else %}

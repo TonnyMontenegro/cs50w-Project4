@@ -1,0 +1,122 @@
+<h1>Hola {{splitx.cliente.nombres}} {{splitx.cliente.apellidos}}</h1>
+
+<h2>Tienes una cuenta que {{cuenta.usuario.first_name}} {{cuenta.usuario.last_name}} creo con sus amigos</h2>
+
+<h2>Lugar:{{cuenta.local.nombre}}</h2>
+<h2>Fecha:{{cuenta.fecha_hora}}</h2>
+<h2>Ocacion:{{cuenta.alias}}</h2>
+
+<h3>Aca tienes todos los detalles:</h3>
+
+<table cellpadding="2" cellspacing="3" align="left" border="1">
+    <thead>
+      <tr>
+    <th>Nombre</th>
+    <th>Precio</th>
+    <th>Cantidad</th>
+    <th>Tipo</th>
+    <th>subtotal</th>
+    <th>+IVA</th>
+  </tr>
+    </thead>
+<tbody>
+{% for orden in ordenes %}
+<tr>
+<th>{{orden.item.nombre}}</th>
+<th>{{orden.item.precio}} $</th>
+<th>{{orden.cantidad_total }}</th>
+<th>{% if orden.dividido%}Orden dividida{% else %}Consumo individual{%endif%}</th>
+<th>{{orden.subtotal }} $</th>
+<th>{{orden.subtotal_iva}} $</th>
+</tr>
+{%endfor%}
+
+<tr>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+  <tr>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th>=</th>
+    <th>{{cuenta.subtotal}} $</th>
+    <th>{{cuenta.total}} $</th>
+  </tr>
+  {%if cuenta.propina %}
+  <tr>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th>Gran Total</th>
+    <th>{{cuenta.total_propina}}</th>
+  </tr>
+  {%endif%}
+</tbody>
+</table>
+
+<div style="margin-top: 100px; padding: 30px;">
+
+    <h2 class="text-center">Consumos detallados de {{splitx.cliente.nombres}} {{splitx.cliente.apellidos}}</h2>
+</div>
+
+    <div>
+          <table cellpadding="2" cellspacing="3" align="left" border="1">
+            <thead>
+            <tr>
+            <th>Orden</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+            <th>Precio unitario</th>
+            <th>consumido</th>
+            <th>split</th>
+          </tr>
+            </thead>
+        <tbody>
+          {% for consumo in consumos %}
+      <tr>
+            <th>{{consumo.orden.item.nombre}}</th>
+            <th>{{consumo.orden.cantidad_total}}</th>
+            <th>{{consumo.orden.subtotal_iva}} $</th>
+            <th>{{consumo.orden.item.precio}} $</th>
+            <th>{%if consumo.orden.dividido %}Consumo compartido{%else%}Consumo individual: {{consumo.cantidad}}{%endif%}</th>
+            <th>{{consumo.monto_iva}} $</th>
+      </tr>
+      {%endfor%}
+          </tbody>
+          </table>
+        </div>  
+
+        <div style="margin-top: 100px; padding: 30px;">
+
+            <h2 class="text-center">Consumos de todos tus amigos</h2>
+        </div>
+
+        <table cellpadding="2" cellspacing="3" align="left" border="1">
+            <thead>
+              <tr>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Correo</th>
+            <th>Split</th>
+            <th class="Propina">Propina</th>
+          </tr>
+            </thead>
+        <tbody>
+      {% for split in splits %}
+      <tr>
+        <th>{{split.cliente.nombres}}</th>
+            <th>{{split.cliente.apellidos}}</th>
+            <th>{{split.cliente.correo}}</th>
+            <th>{{split.monto}} $</th>
+            <th class="Propina">{%if cuenta.propina %}{{split.monto_propina}}{%endif%}</th>
+          </tr>
+      {%endfor%}
+        </tbody>
+          </table>

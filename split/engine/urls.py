@@ -34,4 +34,9 @@ urlpatterns = [
     path('edit_friend/<int:pk>',views.edit_friend ,name="edit_friend"),
     path('bill/<int:pk>',views.bill,name='bill'),
     path('delete_order/<int:pk>',views.delete_orden,name='delete_orden'),
+    path('order_detail/<int:pk>',views.order_detail,name='order_detail'),
+    path('remove_bill/<int:pk>',views.remove_bill,name='remove_bill'),
+    path('client_detail/<int:pk>',views.client_detail,name='client_detail'),
+    path('generate_bills/<int:pk>',views.generate_bills,name='generate_bills'),  
+    path('view_bill/<int:pk>',views.view_bill,name='view_bill'),
 ]

@@ -1,0 +1,47 @@
+Hola {{splitx.cliente.nombres}} {{splitx.cliente.apellidos}}
+
+Tienes una cuenta que {{cuenta.usuario.first_name}} {{cuenta.usuario.last_name}} creo con sus amigos
+
+Lugar:{{cuenta.local.nombre}}
+Fecha:{{cuenta.fecha_hora}}
+Ocacion:{{cuenta.alias}}
+
+Aca tienes todos los detalles:
+
+Nombre-Precio-Cantidad-Tipo-subtotal-+IVA</th>
+{% for orden in ordenes %}
+{{orden.item.nombre}}-{{orden.item.precio}} $-{{orden.cantidad_total }}-{% if orden.dividido%}Orden dividida{% else %}Consumo individual{%endif%}-{{orden.subtotal }} $-{{orden.subtotal_iva}} $</th>
+{%endfor%}
+
+SubTotal:{{cuenta.subtotal}} $
+Total:{{cuenta.total}} $
+Consumos detallados de {{splitx.cliente.nombres}} {{splitx.cliente.apellidos}}
+Orden
+Cantidad
+Total
+Precio unitario
+consumido
+split
+{% for consumo in consumos %}
+{{consumo.orden.item.nombre}}
+{{consumo.orden.cantidad_total}}
+{{consumo.orden.subtotal_iva}} $
+{{consumo.orden.item.precio}} $
+{%if consumo.orden.dividido %}Consumo compartido{%else%}Consumo individual: {{consumo.cantidad}}{%endif%}
+{{consumo.monto_iva}} $
+      {%endfor%}
+
+
+Nombres
+Apellidos
+Correo
+Split
+Propina
+{% for split in splits %}
+ 
+{{split.cliente.nombres}}
+{{split.cliente.apellidos}}
+{{split.cliente.correo}}
+{{split.monto}} $
+{{split.monto_propina}}
+      {%endfor%}

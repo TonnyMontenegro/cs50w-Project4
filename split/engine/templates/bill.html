@@ -35,7 +35,8 @@
     
       <div class="tab-content overflow" id="pills-tabContent">
         <div class="tab-pane fade show active" id="pills-general" role="tabpanel" aria-labelledby="pills-general-tab">
-          <table class="table text-light table-dark table-hover">
+      {% if ordenes %}
+          <table class="table text-light table-dark table-hover text-center">
             <thead>
               <tr>
             <th>Nombre</th>
@@ -56,7 +57,7 @@
         <th>{% if orden.dividido%}Orden dividida{% else %}Consumo individual{%endif%}</th>
         <th>{{orden.subtotal }} $</th>
         <th>{{orden.subtotal_iva}} $</th>
-        <th><button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#Delete_{{orden.pk}}" ><i class="fas fa-trash-alt fa-lg"></i></button></th>
+        <th><a class="btn btn-secondary btn-sm" href="/order_detail/{{orden.pk}}">Detalles <i class="far fa-eye"></i></a> <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#Delete_{{orden.pk}}" ><i class="fas fa-trash-alt fa-lg"></i></button> </th>
       </tr>
 
       <div class="modal fade my-5 text-dark text-left pt-5" id="Delete_{{orden.pk}}" tabindex="1" aria-labelledby="ModalLabel" aria-hidden="true">
@@ -88,24 +89,94 @@
         <th></th>
         <th></th>
         <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+
+      <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th class =" text-center">Subtotales =</th>
         <th>{{cuenta.subtotal}} $</th>
         <th>{{cuenta.total}} $</th>
-        <th><button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#Delete_{{orden.pk}}" ><i class="fas fa-trash-alt fa-lg"></i></button></th>
+        <th><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#close_{{orden.pk}}" >Generar facturas  <i class="fas fa-list fa-lg"></i></button></th>
       </tr>
+        
           </tbody>
           </table>
-
+          {%else%}
+          <div class="m-5 text-center">
+           <h2 class="text-center">Parece que aun no has agregado ninguna orden.</h2>
+           <h5 class="text-center">Puede dirgirte Items añadir un itemy luego agregarlo a esta cuenta</h5>
+           <h5 class="text-center">Tambien si lo deseas puedes cancelar esta cuenta y regresar al menu principal</h5>
+           <a class="btn btn-danger btn-lg m-4" href="/remove_bill/{{cuenta.pk}}">Eliminar cuenta <i class="far fa-trash-alt fa-lg"></i></a>
+          </div>
+          {%endif%}
+          
+          <div class="modal fade my-5 text-dark text-left pt-5" id="close_{{orden.pk}}" tabindex="1" aria-labelledby="ModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content ">
+                <div class="modal-header">
+                  <h2 class="modal-title text-center" id="ModalName">Generar facturas y enviarlas por correo <i class="fas fa-file-invoice-dollar fa-lg"></i></h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form action="/generate_bills/{{cuenta.pk}}" method="POST">
+                    {% csrf_token %}
+    
+                    <div class="form-check">
+                      <label class="form-check-label" for="incluye_propina">
+                        Pagar propina
+                      </label>
+                      <input class="form-check-input" type="checkbox" onclick="TipeEnableDisable(this)" name="incluye_propina" value="SI" id="incluye_propina" checked>
+                    </div>
+                    
+                    <table class="table text-light table-dark table-hover text-center">
+                      <thead>
+                        <tr>
+                      <th>Nombres</th>
+                      <th>Apellidos</th>
+                      <th>Correo</th>
+                      <th>Split</th>
+                      <th class="Propina">Propina</th>
+                    </tr>
+                      </thead>
+                  <tbody>
+                {% for split in splits %}
+                <tr>
+                  <th>{{split.cliente.nombres}}</th>
+                      <th>{{split.cliente.apellidos}}</th>
+                      <th>{{split.cliente.correo}}</th>
+                      <th>{{split.monto}} $</th>
+                      <th class="Propina">{{monto_propinap|floatformat:2}}</th>
+                    </tr>
+                {%endfor%}
+                  </tbody>
+                    </table>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary" aria-current="page">Generar facturas <i class="fas fa-file-invoice-dollar fa-lg"></i></button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar <i class="fas fa-ban fa-lg"></i></button>
+                </div>
+              </form>
+              </div>
+            </div>
+          </div>
+            </div>
 
         </div>
     
         <div class="tab-pane fade" id="pills-split" role="tabpanel" aria-labelledby="pills-split-tab">
-          <table class="table text-light table-dark table-hover">
+          {% if ordenes %}
+          <table class="table text-light table-dark table-hover text-center">
             <thead>
               <tr>
                 <th>Nombre</th>
                 <th>Apellido</th>
                 <th>Correo</th>
                 <th>Split</th>
+                <th></th>
               </tr>
                 </thead>
             <tbody>
@@ -115,15 +186,27 @@
             <th>{{split.cliente.apellidos}}</th>
             <th>{{split.cliente.correo}}</th>
             <th>{{split.monto}} $</th>
+            <th><a class="btn btn-secondary btn-sm" href="/client_detail/{{split.pk}}">Detalles <i class="far fa-eye"></i></a></th>
           </tr>    
           {% endfor %}
           </tbody>
           </table>
+
+          {%else%}
+          <div class="m-5 text-center">
+           <h2 class="text-center">Parece que aun no has agregado ninguna orden.</h2>
+           <h5 class="text-center">Puede dirgirte Items añadir un itemy luego agregarlo a esta cuenta</h5>
+           <h5 class="text-center">Tambien si lo deseas puedes cancelar esta cuenta y regresar al menu principal</h5>
+           <a class="btn btn-danger btn-lg m-4" href="/remove_bill/{{cuenta.pk}}">Eliminar cuenta <i class="far fa-trash-alt fa-lg"></i></a>
+          </div>
+          {%endif%}
+          
+
         </div>
 
         <div class="tab-pane fade" id="pills-items" role="tabpanel" aria-labelledby="pills-items-tab">
           <div class="row row-cols-1 my-2 row-cols-md-2 g-5">
-
+          
             <div class="col">
               <div class="card about-card shadow-lg border-primary">
                   <div class="card-body text-left">
@@ -259,8 +342,20 @@ if (option.checked) {
 }             
 }   
 
+
+function TipeEnableDisable(option) {
+if (option.checked) {
+  $('.Propina').attr("hidden",false);
+
+} else {
+
+  $('.Propina').attr("hidden",true);
+
+}             
+} 
+
 function CheckOrder(event){
-  if($("#Consumo_individual_check").prop("checked")){
+  if($("#").prop("checked")){
     var valid = false;
       $(".num").each(function(){
         if(this.value != 0){

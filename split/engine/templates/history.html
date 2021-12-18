@@ -2,7 +2,24 @@
 {% block Title %} Historial {% endblock %}
 {% block body %} 
 
-<div class="container bg-light Menu rounded py-5 shadow-lg">
+<div class="container bg-light Menu rounded py-5 shadow-lg">´
+    <div class="row">
+    {%for cuenta in cuentas %}
+    <div class="col">
+        <div class="card about-card shadow-lg border-primary">
+            <div class="card-body text-left">
+                <h3>{{cuenta.local.nombre}}: {{cuenta.alias}}</h3>
+                <h3>{{cuenta.fecha_hora}}</h3>
+                <h3>{{cuenta.total}} $</h3>
+                <p>con: {%for p in cuenta.clientes.all %}{{p.nombres}} {{p.apellidos}}, {%endfor%}</p>
+                <div class="container text-center">
+                <a class="btn btn-secondary btn-lg m-3" href="/view_bill/{{cuenta.pk}}">Revisar cuenta  <i class="far fa-eye"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+    {%endfor%}
+</div>
 
 </div>
 

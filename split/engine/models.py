@@ -49,7 +49,8 @@ class cuenta(models.Model):
     subtotal = models.DecimalField(decimal_places=2,max_digits=16,default=0,blank=True,null=True)                 # subtotal de cuenta, no incluye iva ni propina
     propina = models.BooleanField(default=True,blank=True,null=True)                                                         # la cuenta paga propina si o no
     monto_propina = models.DecimalField(decimal_places=2,max_digits=16,default=0,blank=True,null=True)  # 10% de propina para el mesero sobre el subtotal
-    total = models.DecimalField(decimal_places=2,max_digits=16,default=0,blank=True,null=True)                    # total incluyendo propina en caso que haya,iva y todo lo consumido
+    total = models.DecimalField(decimal_places=2,max_digits=16,default=0,blank=True,null=True)                # total incluyendo propina en caso que haya,iva y todo lo consumido
+    total_propina = models.DecimalField(decimal_places=2,max_digits=16,default=0,blank=True,null=True)    
     usuario = models.ForeignKey(User,on_delete=models.CASCADE)                                          # usuario de split que crea la cuenta
     clientes = models.ManyToManyField(cliente,blank=True,related_name="cliente_cuenta")                 # listado de clientes que acompañan al usuario en la mesa
     ordenes = models.ManyToManyField("orden",blank=True,related_name="cuentas_ordenes")       # listado de items que se consumieron
@@ -119,6 +120,8 @@ class consumo(models.Model):
     cantidad = models.IntegerField(null=True, blank=True)
     orden = models.ForeignKey(orden,on_delete=models.CASCADE,blank=True,null=True)
     split = models.ForeignKey("split",on_delete=models.CASCADE,null=True)
+    monto = models.DecimalField(decimal_places=2,max_digits=16,default=0,blank=True,null=True)
+    monto_iva = models.DecimalField(decimal_places=2,max_digits=16,default=0,blank=True,null=True)
     class Meta:
         verbose_name= "consumo"
         verbose_name_plural ="consumos"
@@ -130,6 +133,7 @@ class consumo(models.Model):
 class split(models.Model):
     propina = models.DecimalField(decimal_places=2,max_digits=16,default=0,blank=True,null=True)    # el monto de propina que se debe pagar, la propina se paga entre todos los clientes
     monto = models.DecimalField(decimal_places=2,max_digits=16,default=0,blank=True,null=True)      # monto que debe pagar el usuario en caso de que exista iva ya estara incluido
+    monto_propina = models.DecimalField(decimal_places=2,max_digits=16,default=0,blank=True,null=True)
     cuenta = models.ForeignKey(cuenta,on_delete=models.CASCADE)
     consumos = models.ManyToManyField(consumo,blank=True,related_name="split_consumos")
     cliente = models.ForeignKey(cliente,on_delete=models.CASCADE)

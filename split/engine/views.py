@@ -10,6 +10,9 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 from django.views.defaults import page_not_found
 from django.db.models import Sum
+from django.core.mail import send_mail
+from django.conf import settings
+from django.template.loader import render_to_string
 
 # Create your views here.
 
@@ -57,6 +60,7 @@ def menu_view(request):
     open = cuenta.objects.filter(usuario=request.user,estado="Abierta").exists()
     if open:
         cuentax = cuenta.objects.get(usuario=request.user,estado="Abierta")
+        context['open'] = True
         return redirect(f"/bill/{cuentax.pk}")
 
     context['amigos'] = cliente.objects.filter(usuario_main=request.user).exclude(correo=request.user.email).order_by('nombres')
@@ -82,10 +86,17 @@ def login_view(request):
     else: return redirect("home")
 
 def about_view(request):
-    return render(request,"about.html")
+    context = {}
+    openx = cuenta.objects.filter(usuario=request.user,estado="Abierta").exists()
+    if openx:
+        
+        context['open'] = True
+    return render(request,"about.html",context)
 
 def history_view(request):
-    return render(request,"history.html")
+    context = {}
+    context['cuentas'] = cuenta.objects.filter(usuario=request.user,estado="Cerrada")
+    return render(request,"history.html",context)
 
 def logout_user(request):
     logout(request)
@@ -180,6 +191,7 @@ def bill(request,pk):
     open = cuenta.objects.filter(usuario=request.user,estado="Abierta").exists()
     if open:
         cuentax = cuenta.objects.get(usuario=request.user,estado="Abierta")
+        context['open'] = True
         context['ordenes'] = orden.objects.filter(cuenta=cuentax).all()
         context['cuenta'] = cuentax
         context['clientes'] = cuentax.clientes.all()
@@ -193,7 +205,13 @@ def bill(request,pk):
 
         cuentax.subtotal = subtotal
         cuentax.total = subtotal_iva
-        cuentax.save()
+        if subtotal:
+            cuentax.monto_propina = float(subtotal) * 0.10
+            cuentax.save()
+            cuentax.total_propina = float(cuentax.total) + float(cuentax.monto_propina)
+            cuentax.save()
+            context['monto_propinap'] = cuentax.monto_propina / cuentax.clientes.count()
+        
 
     return render(request,"bill.html",context)
 
@@ -241,7 +259,9 @@ def order_item(request,pk):
             for x in range(0,len(numbers)):
                 if int(numbers[x])>0:
                     splitx = split.objects.get(cuenta=cuentax,cliente=clientesInsert[x])
-                    consumo.objects.create(cliente=clientesInsert[x],cantidad=numbers[x],orden=ordenx,split=splitx)
+                    monto = float(itemorder.precio) * float(numbers[x])
+                    monto_iva = float(monto) + (float(itemorder.monto_iva)*float(numbers[x]))
+                    consumo.objects.create(cliente=clientesInsert[x],cantidad=numbers[x],orden=ordenx,split=splitx,monto=monto,monto_iva=monto_iva)
                     splitx.monto = float(splitx.monto)+((float(itemorder.precio) + float(itemorder.monto_iva))*float(numbers[x]))
                     splitx.save()
             numbers_int = [int(i) for i in numbers]
@@ -268,15 +288,17 @@ def order_item(request,pk):
             ordenx.subtotal_iva=subtotal_iva
             ordenx.save()
             numbers=request.POST.getlist('check')
-            splited = float(ordenx.subtotal_iva) / float(len(numbers)) 
+            splited = float(ordenx.subtotal_iva) / float(len(numbers))
+            montop = subtotal / float(len(numbers))
+            monto_ivap = subtotal_iva / float(len(numbers))
             for x in range(0,len(numbers)):
                 clienteinst = cliente.objects.get(pk=numbers[x])
                 splitx = split.objects.get(cuenta=cuentax,cliente=clienteinst)
-                consumo.objects.create(cliente=clienteinst,orden=ordenx,split=splitx)
+                consumo.objects.create(cliente=clienteinst,orden=ordenx,split=splitx,monto=montop,monto_iva=monto_ivap)
                 splitx.monto = float(splitx.monto)+float(splited)
                 splitx.save()
 
-        return redirect('home')
+        return redirect(f'/bill/{ordenx.pk}')
 
 @login_required(login_url="")
 def delete_orden(request,pk):
@@ -307,3 +329,128 @@ def delete_orden(request,pk):
         else:
             messages.error(request,"Error, la orden no existe")
     return redirect('home')
+
+@login_required(login_url="")
+def order_detail(request,pk):
+    context={}
+    context['orden'] = orden.objects.get(pk=pk)
+    context['consumos'] = consumo.objects.filter(orden=context['orden'])
+    context['cuenta'] = cuenta.objects.get(pk=context['orden'].cuenta.pk)
+    context['splits'] = split.objects.filter(cuenta=context['cuenta'])
+    if context['cuenta'].estado == "Abierta":
+        context['open'] = True
+    else:
+        context['open'] = False
+    return render(request,"order_detail.html",context)
+
+@login_required(login_url="")
+def remove_bill(request,pk):
+    cuentainst =cuenta.objects.get(pk=pk)
+    cuentainst.clientes.clear()
+    cuentainst.ordenes.clear()
+    cuentainst.delete()
+    messages.info(request,"Cuenta eliminada con exito")
+    return redirect('home')
+
+@login_required(login_url="")
+def client_detail(request,pk):
+    context={}
+    context['split'] = split.objects.get(pk=pk)
+    context['cuenta'] = cuenta.objects.get(pk=context['split'].cuenta.pk)
+    context['consumos'] = consumo.objects.filter(split=context['split'] ,cliente=context['split'] .cliente)
+    if context['cuenta'].estado == "Abierta":
+        context['open'] = True
+    else:
+        context['open'] = False
+    return render(request,"client_detail.html",context)
+
+@login_required(login_url="")
+def generate_bills(request,pk):
+    if request.method == "POST":
+        propina=request.POST.get('incluye_propina','NO')
+        cuentax = cuenta.objects.get(pk=pk)
+        splits = split.objects.filter(cuenta=cuentax)
+        if propina == "SI":
+            prop = cuentax.monto_propina / cuentax.clientes.count()
+            context={}
+            cuentax.propina = True
+            cuentax.save()
+            context['cuenta']=cuentax
+            context['splits']=splits
+            context['ordenes']=orden.objects.filter(cuenta=cuentax)
+            for splitx in splits:
+                splitx.monto_propina = prop
+                splitx.save()
+            
+            for splitx in splits:
+                context['splitx']= splitx
+                context['consumos']= consumo.objects.filter(split=splitx)
+
+                msg_plain = render_to_string('email.txt', context)
+                msg_html = render_to_string('email.html',context)
+
+                send_mail(
+                    f'Factura de Split orden #047{pk}S',
+                    msg_plain,
+                    settings.EMAIL_HOST_USER,
+                    [splitx.cliente.correo],
+                    html_message=msg_html,
+                )
+        else:
+            context={}
+            context['cuenta']=cuentax
+            context['splits']=splits
+            context['ordenes']=orden.objects.filter(cuenta=cuentax)
+
+            cuentax.propina = False
+            cuentax.save()
+            
+            for splitx in splits:
+                context['splitx']= splitx
+                context['consumos']= consumo.objects.filter(split=splitx)
+
+                msg_plain = render_to_string('email.txt', context)
+                msg_html = render_to_string('email.html',context)
+
+                send_mail(
+                    f'Factura de Split orden #047{pk}S',
+                    msg_plain,
+                    settings.EMAIL_HOST_USER,
+                    [splitx.cliente.correo],
+                    html_message=msg_html,
+                )
+    cuentax.estado="Cerrada"
+    cuentax.save()
+    return redirect("home")
+
+
+@login_required(login_url="")
+def view_bill(request,pk):
+    context={}
+    cuentax = cuenta.objects.get(pk=pk)
+    if cuentax.estado == "Abierta":
+        context['open'] = True
+    else:
+        context['open'] = False
+    context['ordenes'] = orden.objects.filter(cuenta=cuentax).all()
+    context['cuenta'] = cuentax
+    context['clientes'] = cuentax.clientes.all()
+    context['items'] = item.objects.filter(usuario_main=request.user)
+    context['splits'] = split.objects.filter(cuenta=cuentax).order_by('cliente')
+
+    obj = orden.objects.filter(cuenta=cuentax).all().aggregate(Sum('subtotal'))
+    subtotal= obj['subtotal__sum']
+    obj = orden.objects.filter(cuenta=cuentax).all().aggregate(Sum('subtotal_iva'))
+    subtotal_iva= obj['subtotal_iva__sum']
+
+    cuentax.subtotal = subtotal
+    cuentax.total = subtotal_iva
+    if subtotal:
+        cuentax.monto_propina = float(subtotal) * 0.10
+        cuentax.save()
+        cuentax.total_propina = float(cuentax.total) + float(cuentax.monto_propina)
+        cuentax.save()
+        context['monto_propinap'] = cuentax.monto_propina / cuentax.clientes.count()
+
+    return render(request,"view_bill.html",context)
+    

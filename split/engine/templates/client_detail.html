@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+{% block Title %} Historial de cliente {% endblock %}
+{% block body %} 
+
+<div class="container bg-light Menu rounded py-5 shadow-lg">
+
+
+  {% if messages %}
+  <div class="row m-2">
+  <div class="col-lg text-center">
+      {% for message in messages %}
+      <div class="alert alert-dismissible fade show alert-{{ message.tags }}" role="alert">
+          <p>{{ message }}</p>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+{% endif %}
+
+    
+      <div class="tab-content overflow" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-general" role="tabpanel" aria-labelledby="pills-general-tab">
+          {%if consumos %}
+          <h2 class="text-center">Consumos detallados de {{split.cliente.nombres}} {{split.cliente.apellidos}}</h2>  
+          <div class="text-left"><a class="btn btn-primary btn-lg mt-0 mb-5 mx-4" href="/home"><i class="fas fa-long-arrow-alt-left"></i>  Regresar</a></div>
+          <table class="table text-light table-dark table-hover text-center">
+            <thead>
+            <tr>
+            <th>Orden</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+            <th>Precio unitario</th>
+            <th>consumido</th>
+            <th>split</th>
+            <th></th>
+          </tr>
+            </thead>
+        <tbody>
+          {% for consumo in consumos %}
+      <tr>
+        
+            <th>{{consumo.orden.item.nombre}}</th>
+            <th>{{consumo.orden.cantidad_total}}</th>
+            <th>{{consumo.orden.subtotal_iva}} $</th>
+            <th>{{consumo.orden.item.precio}} $</th>
+            <th>{%if consumo.orden.dividido %}Consumo compartido{%else%}Consumo individual: {{consumo.cantidad}}{%endif%}</th>
+            <th>{{consumo.monto_iva}} $</th>
+            <th><a class="btn btn-secondary btn-sm" href="/order_detail/{{consumo.orden.pk}}">Detalles <i class="far fa-eye"></i></a></th>
+      </tr>
+      {%endfor%}
+          </tbody>
+          </table>
+      {%else%}
+      <h2 class="text-center">Parece que {{split.cliente.nombres}} {{split.cliente.apellidos}} no posee ningun consumo aun...</h2>  
+      <div class="text-left"><a class="btn btn-primary btn-lg mt-0 mb-5 mx-4" href="/home"><i class="fas fa-long-arrow-alt-left"></i>  Regresar</a></div>
+      {%endif%}
+    </div>
+
+<script>
+
+function EnableDisable(option) {
+if (option.checked) {
+  $('.num').attr("hidden",false);
+  $('.check').attr("hidden",true);
+  $(".Consumo_individual").prop( "checked", true );
+  $(".divided").attr("hidden",true);
+
+} else {
+
+  $('.num').attr("hidden",true);
+  $('.check').attr("hidden",false);
+  $(".Consumo_individual").prop( "checked", false );
+  $(".divided").attr("hidden",false);
+
+}             
+}   
+
+function CheckOrder(event){
+  if($("#Consumo_individual_check").prop("checked")){
+    var valid = false;
+      $(".num").each(function(){
+        if(this.value != 0){
+          valid = true;
+        }
+      });
+      if (valid){
+        console.log("todo bien joven")
+      }
+      else{
+        event.preventDefault();
+        alert("Debes seleccionar el consumo para al menos una persona.")
+      }
+  }
+  else{
+    contador=$('[name="check"]:checked').length
+    if(contador < 2){
+        alert("Debes seleccionar el consumo para al menos dos persona.");
+        event.preventDefault();
+    }
+  }
+}
+
+</script>
+{% endblock %}
