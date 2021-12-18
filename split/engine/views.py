@@ -89,7 +89,7 @@ def about_view(request):
     context = {}
     openx = cuenta.objects.filter(usuario=request.user,estado="Abierta").exists()
     if openx:
-        
+
         context['open'] = True
     return render(request,"about.html",context)
 
@@ -108,13 +108,13 @@ def add_local(request):
         Nombre_local = request.POST.get('nombre_local')
         descripcion_local = request.POST.get('descripcion_local')
         existe = local.objects.filter(creador=request.user,nombre=Nombre_local).exists()
-        
+
         if existe:
             messages.error(request,"Ese local ya se encuentra registrado")
         else:
             messages.info(request,"Local registrado con exito")
             local.objects.create(creador=request.user,nombre=Nombre_local,descripcion=descripcion_local)
-        
+
         return redirect('home')
 
 @login_required(login_url="")
@@ -133,13 +133,13 @@ def add_friend(request):
         correo = request.POST.get('email_friend')
 
         existe = cliente.objects.filter(usuario_main=request.user,correo=correo).exists()
-        
+
         if existe:
             messages.error(request,"Ese correo ya se encuentra registrado para otro usuario")
         else:
             messages.info(request,"amigo registrado con exito")
             cliente.objects.create(usuario_main=request.user,nombres=nombres,apellidos=apellidos,correo=correo)
-        
+
         return redirect('home')
 
 @login_required(login_url="")
@@ -151,7 +151,7 @@ def edit_friend(request,pk):
 
         amigo = cliente.objects.get(pk=pk)
         existe = cliente.objects.filter(correo=correo).exclude(pk=pk).exists()
-        
+
         if existe:
             messages.error(request,"Ese correo ya se encuentra registrado para otro usuario")
         else:
@@ -160,8 +160,8 @@ def edit_friend(request,pk):
             amigo.correo = correo
             amigo.save()
             messages.info(request,"amigo editado con exito")
-            
-        
+
+
         return redirect('home')
 
 @login_required(login_url="")
@@ -211,7 +211,7 @@ def bill(request,pk):
             cuentax.total_propina = float(cuentax.total) + float(cuentax.monto_propina)
             cuentax.save()
             context['monto_propinap'] = cuentax.monto_propina / cuentax.clientes.count()
-        
+
 
     return render(request,"bill.html",context)
 
@@ -225,7 +225,7 @@ def add_item(request):
         if iva is None:
             precio_iva = float(precio) * 0.15
             item.objects.create(nombre=nombre,descripcion=descripcion,precio=precio,iva=False,monto_iva=precio_iva,usuario_main=request.user)
-            
+
         else:
             item.objects.create(nombre=nombre,descripcion=descripcion,precio=precio,usuario_main=request.user)
 
@@ -245,7 +245,7 @@ def order_item(request,pk):
                 print("URL order_item: Split ya existe")
             else:
                 split.objects.create(cuenta=cuentax,cliente=cliente_inst)
-        
+
 
         itemorder = item.objects.get(pk=pk)
         Consumo = request.POST.get('Consumo_individual',"compartida")
@@ -272,7 +272,7 @@ def order_item(request,pk):
             else:
                  ordenx.subtotal_iva = ordenx.subtotal
             ordenx.save()
-            
+
         else:
             num = request.POST.get('num_divided','1')
             orden.objects.create(item=itemorder,cuenta=cuentax,dividido=True,cantidad_total=int(num))
@@ -307,12 +307,12 @@ def delete_orden(request,pk):
         if Exist:
             ordenx = orden.objects.get(pk=pk)
             if ordenx.dividido == True:
-                splited = float(ordenx.subtotal_iva) / float(consumo.objects.filter(orden=ordenx).count()) 
+                splited = float(ordenx.subtotal_iva) / float(consumo.objects.filter(orden=ordenx).count())
                 consumosx = consumo.objects.filter(orden=ordenx).all()
                 for x in consumosx:
                     splitinst = split.objects.get(pk=x.split.pk)
                     splitinst.monto = float(splitinst.monto) - splited
-                    print(f"URL: order_delete: Cantidad total #{ordenx.cantidad_total}")       
+                    print(f"URL: order_delete: Cantidad total #{ordenx.cantidad_total}")
                     splitinst.save()
             else:
                 consumosx = consumo.objects.filter(orden=ordenx).all()
@@ -321,9 +321,9 @@ def delete_orden(request,pk):
                     splited = float(x.cantidad) * (float(itemorder.precio) + float(itemorder.monto_iva))
                     splitinst = split.objects.get(pk=x.split.pk)
                     splitinst.monto = float(splitinst.monto) - splited
-                    print(f"URL: order_delete: Cantidad total #{ordenx.cantidad_total}")       
+                    print(f"URL: order_delete: Cantidad total #{ordenx.cantidad_total}")
                     splitinst.save()
-            
+
             orden.objects.filter(pk=pk).delete()
             messages.info(request,"Orden removida de su factura")
         else:
@@ -381,7 +381,7 @@ def generate_bills(request,pk):
             for splitx in splits:
                 splitx.monto_propina = prop
                 splitx.save()
-            
+
             for splitx in splits:
                 context['splitx']= splitx
                 context['consumos']= consumo.objects.filter(split=splitx)
@@ -404,7 +404,7 @@ def generate_bills(request,pk):
 
             cuentax.propina = False
             cuentax.save()
-            
+
             for splitx in splits:
                 context['splitx']= splitx
                 context['consumos']= consumo.objects.filter(split=splitx)
@@ -453,4 +453,3 @@ def view_bill(request,pk):
         context['monto_propinap'] = cuentax.monto_propina / cuentax.clientes.count()
 
     return render(request,"view_bill.html",context)
-    
